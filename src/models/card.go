@@ -29,13 +29,13 @@ func AddCard(p *Card) (id int64, err error) {
 
 // GetCards 获取所有卡片
 func GetCards() (cards []Card, err error) {
-	err = SQLDB.Where(&Card{IsDeleted: 0}).Find(&cards).Error
+	err = SQLDB.Where("is_deleted = ?", 0).Find(&cards).Error
 	return
 }
 
 // GetCardByID 根据 ID 修改卡片
 func GetCardByID(id int) (card Card, err error) {
-	err = SQLDB.Where(&Card{IsDeleted: 0}).Find(&card, id).Error
+	err = SQLDB.Where("is_deleted = ?", 0).Find(&card, id).Error
 	return
 }
 

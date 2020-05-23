@@ -30,13 +30,13 @@ func AddUser(p *User) (id int64, err error) {
 
 // GetUsers 获取所有用户
 func GetUsers() (users []User, err error) {
-	err = SQLDB.Where(&User{IsDeleted: 0}).Find(&users).Error
+	err = SQLDB.Where("is_deleted = ?", 0).Find(&users).Error
 	return
 }
 
 // GetUserByID 根据 ID 获取用户
 func GetUserByID(id int) (user User, err error) {
-	err = SQLDB.Where(&User{IsDeleted: 0}).Find(&user, id).Error
+	err = SQLDB.Where("is_deleted = ?", 0).Find(&user, id).Error
 	return
 }
 
