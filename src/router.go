@@ -21,6 +21,8 @@ func initRouter() *gin.Engine {
 
 			users.GET("/:id", apis.GetUserAPI)
 
+			users.GET("/:id/cards", apis.GetCardsByUserID)
+
 			users.PUT("/:id", apis.ModUserAPI)
 
 			users.DELETE("/:id", apis.DelUserAPI)

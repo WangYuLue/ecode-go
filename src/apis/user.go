@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AddUserAPI 添加用户
+// AddUserAPI 添加 card
 func AddUserAPI(c *gin.Context) {
 	// nick := c.Request.FormValue("nick")
 	// nick := c.PostForm("nick")
@@ -19,8 +19,7 @@ func AddUserAPI(c *gin.Context) {
 		utils.HandelError(c, utils.StatusBadMessage.Illegal.Data)
 		return
 	}
-	_, err := models.AddUser(&u)
-	if err != nil {
+	if models.AddUser(&u) != nil {
 		utils.HandelError(c, utils.StatusBadMessage.Fail.Add)
 		return
 	}
@@ -29,7 +28,7 @@ func AddUserAPI(c *gin.Context) {
 	})
 }
 
-// GetUsersAPI 获取所有用户
+// GetUsersAPI 获取所有 card
 func GetUsersAPI(c *gin.Context) {
 	data, err := models.GetUsers()
 	if err != nil {
@@ -41,7 +40,7 @@ func GetUsersAPI(c *gin.Context) {
 	})
 }
 
-// GetUserAPI 根据 ID 获取用户
+// GetUserAPI 根据 ID 获取 card
 func GetUserAPI(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -49,6 +48,23 @@ func GetUserAPI(c *gin.Context) {
 		return
 	}
 	data, err := models.GetUserByID(id)
+	if err != nil {
+		utils.HandelError(c, utils.StatusBadMessage.None.User)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
+}
+
+// GetCardsByUserID 根据 ID 获取 card
+func GetCardsByUserID(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
+		return
+	}
+	data, err := models.GetCardsByUserID(id)
 	if err != nil {
 		utils.HandelError(c, utils.StatusBadMessage.None.User)
 		return

@@ -17,8 +17,7 @@ func AddCardAPI(c *gin.Context) {
 		utils.HandelError(c, utils.StatusBadMessage.Illegal.Data)
 		return
 	}
-	_, err := models.AddCard(&u)
-	if err != nil {
+	if models.AddCard(&u) != nil {
 		utils.HandelError(c, utils.StatusBadMessage.Fail.Add)
 		return
 	}
