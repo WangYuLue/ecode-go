@@ -18,8 +18,6 @@ func InitRouter() *gin.Engine {
 		// 登录
 		v1.POST("/login", apis.Login)
 
-		// 退出登录
-		v1.DELETE("/logout", apis.Logout)
 		users := v1.Group("/users")
 		{
 			// 注册用户

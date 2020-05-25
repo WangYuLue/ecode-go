@@ -31,11 +31,6 @@ func Login(c *gin.Context) {
 	return
 }
 
-// Logout -
-func Logout(c *gin.Context) {
-
-}
-
 // 生成令牌
 func generateToken(c *gin.Context, user models.User) {
 	j := myjwt.NewJWT()
