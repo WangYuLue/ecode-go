@@ -1,12 +1,13 @@
-package main
+package routers
 
 import (
 	"github.com/gin-gonic/gin"
 
-	"ecode/apis"
+	apis "ecode/routers/apis/v1"
 )
 
-func initRouter() *gin.Engine {
+// InitRouter -
+func InitRouter() *gin.Engine {
 	router := gin.Default()
 
 	router.GET("/", apis.IndexAPI)
