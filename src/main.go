@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+
 	defer db.SQLDB.Close()
 	router := routers.InitRouter()
 	router.Run(":8000")

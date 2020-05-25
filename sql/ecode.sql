@@ -4,6 +4,8 @@ CREATE TABLE `user`
 (
  `user_id`      int unsigned NOT NULL AUTO_INCREMENT ,
  `nick`         varchar(100) NOT NULL DEFAULT '' ,
+ `email`        varchar(100) NOT NULL DEFAULT '' ,
+ `password`     varchar(100) NOT NULL DEFAULT '' ,
  `introduction` varchar(1000) NOT NULL DEFAULT '' ,
  `github`       varchar(100) NOT NULL DEFAULT '' ,
  `person_url`   varchar(100) NOT NULL DEFAULT '' ,

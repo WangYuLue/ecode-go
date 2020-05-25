@@ -8,10 +8,11 @@ import (
 
 // SStatusFailMessage 失败提示
 type SStatusFailMessage struct {
-	Add string
-	Del string
-	Mod string
-	Get string
+	Add   string
+	Del   string
+	Mod   string
+	Get   string
+	Login string
 }
 
 // SStatusIllegalMessage 非法提示
@@ -36,10 +37,11 @@ type SStatusBadMessage struct {
 // StatusBadMessage 请求异常返回的信息
 var StatusBadMessage = SStatusBadMessage{
 	Fail: SStatusFailMessage{
-		Add: "添加失败",
-		Del: "删除失败",
-		Mod: "修改失败",
-		Get: "查询失败",
+		Add:   "添加失败",
+		Del:   "删除失败",
+		Mod:   "修改失败",
+		Get:   "查询失败",
+		Login: "登录失败",
 	},
 	Illegal: SStatusIllegalMessage{
 		ID:   "ID不合法",

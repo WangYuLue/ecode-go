@@ -11,6 +11,7 @@ type User struct {
 	Introduction string    `gorm:"type:varchar(1000);NOT NULL;DEFAULT:''"`
 	Github       string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''"`
 	PersonURL    string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''"`
+	Email        string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''"`
 	CreatedAt    time.Time `gorm:"NOT NULL;DEFAULT:CURRENT_TIMESTAMP"`
 	UpdatedAt    time.Time `gorm:"NOT NULL;DEFAULT:CURRENT_TIMESTAMP"`
 	IsDeleted    int       `gorm:"NOT NULL;DEFAULT:0"`
