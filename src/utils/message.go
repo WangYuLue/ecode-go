@@ -6,42 +6,46 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type statusFailMessage struct {
+// SStatusFailMessage 失败提示
+type SStatusFailMessage struct {
 	Add string
 	Del string
 	Mod string
 	Get string
 }
 
-type statusIllegalMessage struct {
+// SStatusIllegalMessage 非法提示
+type SStatusIllegalMessage struct {
 	ID   string
 	Data string
 }
 
-type statusNoneMessage struct {
+// SStatusNoneMessage 不存在提示
+type SStatusNoneMessage struct {
 	User string
 	Card string
 }
 
-type statusBadMessage struct {
-	Fail    statusFailMessage
-	Illegal statusIllegalMessage
-	None    statusNoneMessage
+// SStatusBadMessage 请求失败提示汇总
+type SStatusBadMessage struct {
+	Fail    SStatusFailMessage
+	Illegal SStatusIllegalMessage
+	None    SStatusNoneMessage
 }
 
 // StatusBadMessage 请求异常返回的信息
-var StatusBadMessage = statusBadMessage{
-	Fail: statusFailMessage{
+var StatusBadMessage = SStatusBadMessage{
+	Fail: SStatusFailMessage{
 		Add: "添加失败",
 		Del: "删除失败",
 		Mod: "修改失败",
 		Get: "查询失败",
 	},
-	Illegal: statusIllegalMessage{
+	Illegal: SStatusIllegalMessage{
 		ID:   "ID不合法",
 		Data: "数据不合法",
 	},
-	None: statusNoneMessage{
+	None: SStatusNoneMessage{
 		User: "用户不存在",
 		Card: "卡片不存在",
 	},
