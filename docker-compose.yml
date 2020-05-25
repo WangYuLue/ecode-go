@@ -10,6 +10,7 @@ services:
       MYSQL_ROOT_PASSWORD: 123qwe
     volumes:
       - "./.mysql-data/db:/var/lib/mysql"
+      - "./sql:/sql"
   redis:
     image: redis:latest
     container_name: redis
