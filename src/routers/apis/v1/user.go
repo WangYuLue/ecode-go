@@ -6,14 +6,15 @@ import (
 
 	"ecode/models"
 	"ecode/utils"
+	"ecode/utils/email"
 
 	"github.com/gin-gonic/gin"
 )
 
 // AddUserAPI 添加 card
 func AddUserAPI(c *gin.Context) {
-	// nick := c.Request.FormValue("nick")
-	// nick := c.PostForm("nick")
+	// name := c.Request.FormValue("name")
+	// name := c.PostForm("name")
 	var u models.User
 	if c.ShouldBind(&u) != nil {
 		utils.HandelError(c, utils.StatusBadMessage.Illegal.Data)
@@ -23,8 +24,11 @@ func AddUserAPI(c *gin.Context) {
 		utils.HandelError(c, utils.StatusBadMessage.Fail.Add)
 		return
 	}
+	emailTemplete := email.UserConfirmTemplete("", "", "")
+
+	email.SendEmailByAdmin(email.UserConfirmTitle(), emailTemplete, "wangyulue@gmail.com")
 	c.JSON(http.StatusOK, gin.H{
-		"data": "添加用户成功",
+		"data": "用户注册成功",
 	})
 }
 
@@ -77,7 +81,7 @@ func GetCardsByUserID(c *gin.Context) {
 // ModUserAPI 修改用户
 func ModUserAPI(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
-	nick := c.PostForm("nick")
+	name := c.PostForm("name")
 	if err != nil {
 		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
 		return
@@ -87,7 +91,7 @@ func ModUserAPI(c *gin.Context) {
 		utils.HandelError(c, utils.StatusBadMessage.None.User)
 		return
 	}
-	err = models.ModUserByID(id, nick)
+	err = models.ModUserByID(id, name)
 	if err != nil {
 		utils.HandelError(c, utils.StatusBadMessage.Fail.Mod)
 		return

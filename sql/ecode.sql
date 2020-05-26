@@ -3,7 +3,7 @@
 CREATE TABLE `user`
 (
  `user_id`      int unsigned NOT NULL AUTO_INCREMENT ,
- `nick`         varchar(100) NOT NULL DEFAULT '' ,
+ `name`         varchar(100) NOT NULL DEFAULT '' ,
  `email`        varchar(100) NOT NULL DEFAULT '' ,
  `password`     varchar(100) NOT NULL DEFAULT '' ,
  `introduction` varchar(1000) NOT NULL DEFAULT '' ,
@@ -11,12 +11,13 @@ CREATE TABLE `user`
  `person_url`   varchar(100) NOT NULL DEFAULT '' ,
  `created_at`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  `updated_at`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
- `is_deleted`   tinyint NOT NULL DEFAULT 0 ,
+ -- 用户状态 -1 表示已删除； 0 表示未激活； 1 表示正常
+ `status`       tinyint NOT NULL DEFAULT 0 ,
  `data`         text NULL ,
 
 PRIMARY KEY (`user_id`)
 ) COMMENT='用户表' CHARSET=utf8mb4;
-
+w
 -- 问答表
 
 CREATE TABLE `card`
@@ -27,7 +28,7 @@ CREATE TABLE `card`
  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  `auther_id`  int unsigned NOT NULL ,
- `is_deleted` tinyint NOT NULL DEFAULT 0 ,
+ `status`     tinyint NOT NULL DEFAULT 0 ,
  `data`       text NULL ,
 
 PRIMARY KEY (`card_id`),
@@ -42,7 +43,7 @@ CREATE TABLE `tag`
  `name`       varchar(100) NOT NULL ,
  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
- `is_deleted` tinyint NOT NULL DEFAULT 0 ,
+ `status`     tinyint NOT NULL DEFAULT 0 ,
  `data`       text NULL ,
 
 PRIMARY KEY (`tag_id`)
@@ -56,7 +57,7 @@ CREATE TABLE `category`
  `name`        varchar(100) NOT NULL ,
  `created_at`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  `updated_at`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
- `is_deleted`  tinyint NOT NULL DEFAULT 0 ,
+ `status`      tinyint NOT NULL DEFAULT 0 ,
  `user_id`     int unsigned NOT NULL ,
  `data`        text NULL ,
 
@@ -122,7 +123,7 @@ CREATE TABLE `comment`
  `user_id`           int unsigned NOT NULL ,
  `content`           text NOT NULL ,
  `like_count`        int NOT NULL DEFAULT 0 COMMENT '评论被点赞的数量' ,
- `is_deleted`        tinyint NOT NULL DEFAULT 0 ,
+ `status`            tinyint NOT NULL DEFAULT 0 ,
  `created_at`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  `updated_at`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  `data`              text NULL ,
@@ -142,7 +143,7 @@ CREATE TABLE `user_card`
  `user_id`    int unsigned NOT NULL ,
  `factor`     decimal(1) NOT NULL DEFAULT 0.0 ,
  `schedule`   int NOT NULL DEFAULT 0 ,
- `is_deleted` tinyint NOT NULL DEFAULT 0 ,
+ `status`     tinyint NOT NULL DEFAULT 0 ,
  `like`       tinyint NOT NULL DEFAULT 0 ,
  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,

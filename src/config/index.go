@@ -9,6 +9,14 @@ type SMysql struct {
 	DBName   string
 }
 
+// SRedis struct
+type SRedis struct {
+	Password string
+	IP       string
+	Port     string
+	DB       int
+}
+
 // SEmail struct
 type SEmail struct {
 	User     string

@@ -15,35 +15,47 @@ func InitRouter() *gin.Engine {
 
 	v1 := router.Group("/v1")
 	{
-		// 登录
-		v1.POST("/login", apis.Login)
-
 		users := v1.Group("/users")
 		{
-			// 注册用户
-			users.POST("/", apis.AddUserAPI)
+			{
+				// 注册
+				users.POST("/register", apis.AddUserAPI)
+				// 登录
+				users.POST("/login", apis.Login)
+				// 更新 token
+				users.POST("/token", apis.UpdateToken)
+				// 邮箱激活
+				users.GET("/:id/email-confirm/:uuid", apis.EmailConfirm)
+			}
+			token := users.Group("/", jwt.Auth())
+			{
+				token.GET("/", apis.GetUsersAPI)
 
-			users.GET("/", jwt.Auth(), apis.GetUsersAPI)
+				token.GET("/:id", apis.GetUserAPI)
 
-			users.GET("/:id", apis.GetUserAPI)
+				token.GET("/:id/cards", apis.GetCardsByUserID)
 
-			users.GET("/:id/cards", apis.GetCardsByUserID)
+				token.PUT("/:id", apis.ModUserAPI)
+				// 注销用户
+				token.DELETE("/:id", apis.DelUserAPI)
+			}
 
-			users.PUT("/:id", apis.ModUserAPI)
-			// 注销用户
-			users.DELETE("/:id", apis.DelUserAPI)
 		}
 		cards := v1.Group("/cards")
 		{
-			cards.POST("/", apis.AddCardAPI)
+			token := cards.Group("/")
+			{
+				token.POST("/", apis.AddCardAPI)
 
-			cards.GET("/", apis.GetCardsAPI)
+				token.GET("/", apis.GetCardsAPI)
 
-			cards.GET("/:id", apis.GetCardAPI)
+				token.GET("/:id", apis.GetCardAPI)
 
-			cards.PUT("/:id", apis.ModCardAPI)
+				token.PUT("/:id", apis.ModCardAPI)
 
-			cards.DELETE("/:id", apis.DelCardAPI)
+				token.DELETE("/:id", apis.DelCardAPI)
+			}
+
 		}
 	}
 

@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"ecode/databases/redis"
 	myjwt "ecode/middleware/jwt"
 	"ecode/models"
 	"ecode/utils"
@@ -13,7 +14,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Login -
+var j = myjwt.NewJWT()
+
+// Login 登录接口
 func Login(c *gin.Context) {
 	email := c.PostForm("email")
 	password := c.PostForm("password")
@@ -31,9 +34,23 @@ func Login(c *gin.Context) {
 	return
 }
 
+// UpdateToken 更新token
+func UpdateToken(c *gin.Context) {
+	token := c.PostForm("token")
+	newToken, err := j.RefreshToken(token)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "令牌更新失败",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"token": newToken,
+	})
+}
+
 // 生成令牌
 func generateToken(c *gin.Context, user models.User) {
-	j := myjwt.NewJWT()
 
 	claims := myjwt.CustomClaims{
 		ID:    strconv.Itoa(user.ID),
@@ -60,4 +77,27 @@ func generateToken(c *gin.Context, user models.User) {
 		"token": token,
 	})
 	return
+}
+
+// EmailConfirm 邮箱激活
+func EmailConfirm(c *gin.Context) {
+	id := c.PostForm("id")
+	uuid1 := c.PostForm("uuid")
+	if id == "" || uuid1 == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "激活链接不合法",
+		})
+		return
+	}
+	uuid2 := redis.DB.HGet("EmailConfirm", id).Val()
+	if uuid1 != uuid2 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "验证失败",
+		})
+		return
+	}
+	// TODO:重定向
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "验证成功",
+	})
 }

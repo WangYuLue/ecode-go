@@ -1,4 +1,4 @@
-package databases
+package mysql
 
 import (
 	"ecode/config"
@@ -11,8 +11,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// SQLDB db
-var SQLDB *gorm.DB
+var DB *gorm.DB
 
 func init() {
 	mysql := config.Mysql
@@ -22,8 +21,8 @@ func init() {
 	//打开数据库,前者是驱动名，所以要导入： _ "github.com/go-sql-driver/mysql"
 	db, err := gorm.Open("mysql", path)
 	if err != nil {
-		panic("failed to connect database")
+		panic("mysql 连接失败")
 	}
-	SQLDB = db
-	fmt.Println("connnect success")
+	DB = db
+	fmt.Println("mysql 连接成功")
 }

@@ -24,7 +24,7 @@ func Auth() gin.HandlerFunc {
 		tokenData := strings.Split(authorization, " ")
 		header := tokenData[0]
 		if len(tokenData) != 2 || header != "Bearer" {
-			c.JSON(http.StatusBadRequest, gin.H{
+			c.JSON(http.StatusUnauthorized, gin.H{
 				"msg": "请求头 Authorization 不合法",
 			})
 			c.Abort()
@@ -32,7 +32,7 @@ func Auth() gin.HandlerFunc {
 		}
 		token := tokenData[1]
 		if token == "" {
-			c.JSON(http.StatusBadRequest, gin.H{
+			c.JSON(http.StatusUnauthorized, gin.H{
 				"msg": "请求未携带token，无权限访问",
 			})
 			c.Abort()
@@ -44,13 +44,13 @@ func Auth() gin.HandlerFunc {
 		claims, err := j.ParseToken(token)
 		if err != nil {
 			if err == errTokenExpired {
-				c.JSON(http.StatusBadRequest, gin.H{
+				c.JSON(http.StatusUnauthorized, gin.H{
 					"msg": "令牌已过期",
 				})
 				c.Abort()
 				return
 			}
-			c.JSON(http.StatusBadRequest, gin.H{
+			c.JSON(http.StatusUnauthorized, gin.H{
 				"msg": err.Error(),
 			})
 			c.Abort()
@@ -108,11 +108,10 @@ func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
 	return nil, errTokenInvalid
 }
 
-// RefreshToken -
+// RefreshToken 刷新token
+// 刷新逻辑: 前端用未过期的 token 来换取最新的 token；
+//          每天最多刷新一次 token，逻辑放在 axios 拦截器中实现；
 func (j *JWT) RefreshToken(tokenString string) (string, error) {
-	jwt.TimeFunc = func() time.Time {
-		return time.Unix(0, 0)
-	}
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
 	})

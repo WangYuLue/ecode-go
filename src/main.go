@@ -1,13 +1,14 @@
 package main
 
 import (
-	db "ecode/databases"
+	"ecode/databases/mysql"
+	"ecode/databases/redis"
 	"ecode/routers"
 )
 
 func main() {
-
-	defer db.SQLDB.Close()
+	defer mysql.DB.Close()
+	defer redis.DB.Close()
 	router := routers.InitRouter()
 	router.Run(":8000")
 }

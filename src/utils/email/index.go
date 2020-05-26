@@ -24,26 +24,14 @@ func SendEmail(user, password, host, to, subject, body, mailtype string) error {
 }
 
 // SendEmailByAdmin 管理员发送邮件
-func SendEmailByAdmin() {
+func SendEmailByAdmin(title, html, to string) {
 	user := config.Email.User
 	password := config.Email.Password
 	host := config.Email.Host
-	to := "1206180097@qq.com"
-	// to := "wangyulue@gmail.com"
 
-	subject := "使用Golang发送邮件"
-
-	body := `
-		<html>
-		<body>
-		<h3>
-		"Test send to email"
-		</h3>
-		</body>
-		</html>
-		`
 	fmt.Println("邮件发送中...")
-	err := SendEmail(user, password, host, to, subject, body, "html")
+
+	err := SendEmail(user, password, host, to, title, html, "html")
 	if err != nil {
 		fmt.Println("邮件发送失败")
 		fmt.Println(err)
