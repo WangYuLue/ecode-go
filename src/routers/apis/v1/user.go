@@ -60,6 +60,10 @@ func GetUsersAPI(c *gin.Context) {
 		utils.HandelError(c, utils.StatusBadMessage.Fail.Get)
 		return
 	}
+	// out, _ := StructPick(data, models.UserMap)
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"data": out,
+	// })
 	c.JSON(http.StatusOK, gin.H{
 		"data": data,
 	})
@@ -77,8 +81,9 @@ func GetUserAPI(c *gin.Context) {
 		utils.HandelError(c, utils.StatusBadMessage.None.User)
 		return
 	}
+	out, _ := StructPick(data, models.UserMap)
 	c.JSON(http.StatusOK, gin.H{
-		"data": data,
+		"data": out,
 	})
 }
 

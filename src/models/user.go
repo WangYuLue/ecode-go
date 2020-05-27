@@ -21,6 +21,8 @@ type User struct {
 	Cards  []Card `gorm:"foreignkey:AutherID"`
 }
 
+var UserMap = []string{"ID", "Name", "Introduction", "Github", "PersonURL", "Email"}
+
 // Login 用户登录
 func Login(email, password string) (user User, err error) {
 	queryString := "status = ? AND email = ? AND password = ? AND email <> '' AND password <> ''"

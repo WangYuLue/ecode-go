@@ -4,6 +4,7 @@ import (
 	"ecode/config"
 	"errors"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -33,7 +34,7 @@ func Auth() gin.HandlerFunc {
 		token := tokenData[1]
 		if token == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
-				"msg": "请求未携带token，无权限访问",
+				"msg": "请求未携带令牌，无权限访问",
 			})
 			c.Abort()
 			return
@@ -56,6 +57,16 @@ func Auth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		idInt, _ := strconv.Atoi(claims.ID)
+		// 默认前 100 个用户是管理员
+		if idInt > 100 && claims.ID != c.Param("userid") {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "当前令牌无权限访问该资源",
+			})
+			c.Abort()
+			return
+		}
+
 		// 继续交由下一个路由处理,并将解析出的信息传递下去
 		c.Set("claims", claims)
 	}
