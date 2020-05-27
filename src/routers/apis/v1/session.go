@@ -81,8 +81,8 @@ func generateToken(c *gin.Context, user models.User) {
 
 // EmailConfirm 邮箱激活
 func EmailConfirm(c *gin.Context) {
-	id := c.PostForm("id")
-	uuid1 := c.PostForm("uuid")
+	id := c.Param("id")
+	uuid1 := c.Param("uuid")
 	if id == "" || uuid1 == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": "激活链接不合法",

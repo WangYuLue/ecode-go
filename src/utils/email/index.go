@@ -1,8 +1,11 @@
 package email
 
 import (
+	"bytes"
 	"ecode/config"
+	"ecode/models"
 	"fmt"
+	"html/template"
 	"net/smtp"
 	"strings"
 )
@@ -30,7 +33,6 @@ func SendEmailByAdmin(title, html, to string) {
 	host := config.Email.Host
 
 	fmt.Println("邮件发送中...")
-
 	err := SendEmail(user, password, host, to, title, html, "html")
 	if err != nil {
 		fmt.Println("邮件发送失败")
@@ -39,3 +41,22 @@ func SendEmailByAdmin(title, html, to string) {
 		fmt.Println("邮件发送成功")
 	}
 }
+
+// GenEmailHTML 生成email模版文件
+func GenEmailHTML(data models.Mail) (string, error) {
+	var doc bytes.Buffer
+	var err error
+	var t *template.Template
+	t, err = template.ParseFiles("templates/email.html") //从文件创建一个模板
+	if err != nil {
+		return "", err
+	}
+	err = t.Execute(&doc, data)
+	if err != nil {
+		return "", err
+	}
+	return doc.String(), nil
+}
+
+// UserConfirmTitle -
+var UserConfirmTitle = "ECode 激活邮件"

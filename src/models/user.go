@@ -10,6 +10,7 @@ type User struct {
 	Name         string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''" json:"name" form:"name"`
 	Introduction string    `gorm:"type:varchar(1000);NOT NULL;DEFAULT:''"`
 	Github       string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''"`
+	Password     string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''"`
 	PersonURL    string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''"`
 	Email        string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''"`
 	CreatedAt    time.Time `gorm:"NOT NULL;DEFAULT:CURRENT_TIMESTAMP"`
@@ -20,14 +21,21 @@ type User struct {
 	Cards  []Card `gorm:"foreignkey:AutherID"`
 }
 
+// Login 用户登录
+func Login(email, password string) (user User, err error) {
+	queryString := "status = ? AND email = ? AND password = ? AND email <> '' AND password <> ''"
+	err = SQLDB.Where(queryString, 0, email, password).Find(&user).Error
+	return
+}
+
 // TableName 表名
 func (User) TableName() string {
 	return "user"
 }
 
 // AddUser 添加 user
-func AddUser(p *User) (err error) {
-	err = SQLDB.Create(p).Error
+func AddUser(p *User) (user User, err error) {
+	err = SQLDB.Create(p).Find(&user).Error
 	return
 }
 
