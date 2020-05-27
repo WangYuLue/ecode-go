@@ -5,14 +5,12 @@ import (
 	"net/http"
 	"strconv"
 
-	"ecode/databases/redis"
+	"ecode/controllers"
 	"ecode/models"
 	"ecode/utils"
-	"ecode/utils/email"
 	"ecode/utils/md5"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gofrs/uuid"
 )
 
 // AddUserAPI 添加 card
@@ -26,6 +24,18 @@ func AddUserAPI(c *gin.Context) {
 		utils.HandelError(c, utils.StatusBadMessage.Illegal.Data)
 		return
 	}
+	if users, err := models.GetUserByName(nameStr); err != nil || len(users) != 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"data": "用户名已存在",
+		})
+		return
+	}
+	if users, err := models.GetUserByEmail(emailStr); err != nil || len(users) != 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"data": "邮箱已注册",
+		})
+		return
+	}
 	passwordStr = md5.Md5(passwordStr)
 	p := &models.User{
 		Name:     nameStr,
@@ -37,17 +47,7 @@ func AddUserAPI(c *gin.Context) {
 		utils.HandelError(c, utils.StatusBadMessage.Fail.Add)
 		return
 	}
-	uuidStr := uuid.Must(uuid.NewV4()).String()
-	redis.DB.HSet("EmailConfirm", strconv.Itoa(user.ID), uuidStr)
-	emailData := models.Mail{Name: user.Name, URL: "http://localhost:8000/v1/users/" + strconv.Itoa(user.ID) + "/email-confirm/" + uuidStr}
-	emailTemplete, err := email.GenEmailHTML(emailData)
-	if err != nil {
-		log.Println("邮件模版生成异常")
-	} else {
-		// 发送用户激活邮件
-		go email.SendEmailByAdmin(email.UserConfirmTitle, emailTemplete, emailStr)
-	}
-
+	controllers.SendUserConfirmEmail(user)
 	c.JSON(http.StatusOK, gin.H{
 		"data": "用户注册成功",
 	})
@@ -67,7 +67,7 @@ func GetUsersAPI(c *gin.Context) {
 
 // GetUserAPI 根据 ID 获取 card
 func GetUserAPI(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
 		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
 		return
@@ -84,7 +84,7 @@ func GetUserAPI(c *gin.Context) {
 
 // GetCardsByUserID 根据 ID 获取 card
 func GetCardsByUserID(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
 		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
 		return
@@ -101,7 +101,7 @@ func GetCardsByUserID(c *gin.Context) {
 
 // ModUserAPI 修改用户
 func ModUserAPI(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("userid"))
 	name := c.PostForm("name")
 	if err != nil {
 		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
@@ -124,7 +124,7 @@ func ModUserAPI(c *gin.Context) {
 
 // DelUserAPI 删除用户
 func DelUserAPI(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
 		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
 		return

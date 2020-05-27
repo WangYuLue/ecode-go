@@ -57,6 +57,3 @@ func GenEmailHTML(data models.Mail) (string, error) {
 	}
 	return doc.String(), nil
 }
-
-// UserConfirmTitle -
-var UserConfirmTitle = "ECode 激活邮件"

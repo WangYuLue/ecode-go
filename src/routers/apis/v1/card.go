@@ -40,7 +40,7 @@ func GetCardsAPI(c *gin.Context) {
 
 // GetCardAPI 根据 ID 获取卡片
 func GetCardAPI(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("cardid"))
 	if err != nil {
 		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
 		return
@@ -57,7 +57,7 @@ func GetCardAPI(c *gin.Context) {
 
 // ModCardAPI 修改卡片
 func ModCardAPI(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("cardid"))
 	question := c.PostForm("question")
 	answer := c.PostForm("answer")
 	if err != nil {
@@ -81,7 +81,7 @@ func ModCardAPI(c *gin.Context) {
 
 // DelCardAPI 删除卡片
 func DelCardAPI(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("cardid"))
 	if err != nil {
 		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
 		return

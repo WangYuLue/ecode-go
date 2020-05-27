@@ -8,13 +8,13 @@ import (
 type User struct {
 	ID           int       `gorm:"column:user_id;AUTO_INCREMENT;primary_key" json:"id" form:"id"`
 	Name         string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''" json:"name" form:"name"`
-	Introduction string    `gorm:"type:varchar(1000);NOT NULL;DEFAULT:''"`
-	Github       string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''"`
-	Password     string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''"`
-	PersonURL    string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''"`
-	Email        string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''"`
-	CreatedAt    time.Time `gorm:"NOT NULL;DEFAULT:CURRENT_TIMESTAMP"`
-	UpdatedAt    time.Time `gorm:"NOT NULL;DEFAULT:CURRENT_TIMESTAMP"`
+	Introduction string    `gorm:"type:varchar(1000);NOT NULL;DEFAULT:''" json:"introduction" form:"introduction"`
+	Github       string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''" json:"github" form:"github"`
+	Password     string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''" `
+	PersonURL    string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''" json:"personURL" form:"personURL"`
+	Email        string    `gorm:"type:varchar(100);NOT NULL;DEFAULT:''" json:"email" form:"email"`
+	CreatedAt    time.Time `gorm:"NOT NULL;DEFAULT:CURRENT_TIMESTAMP" json:"createdAt" form:"createdAt"`
+	UpdatedAt    time.Time `gorm:"NOT NULL;DEFAULT:CURRENT_TIMESTAMP" json:"updatedAt" form:"updatedAt"`
 	// 用户状态 -1 表示已删除； 0 表示未激活； 1 表示正常
 	Status int    `gorm:"NOT NULL;DEFAULT:0"`
 	Data   string `gorm:"DEFAULT:NULL"`
@@ -39,6 +39,12 @@ func AddUser(p *User) (user User, err error) {
 	return
 }
 
+// ActiveUser 激活 user
+func ActiveUser(id int) (user User, err error) {
+	err = SQLDB.Model(User{ID: id}).Update("status", 1).Error
+	return
+}
+
 // GetUsers 获取所有 user
 func GetUsers() (users []User, err error) {
 	err = SQLDB.Not(User{Status: -1}).Find(&users).Error
@@ -58,6 +64,18 @@ func GetUserByID(id int) (user User, err error) {
 	// SQLDB.Debug().Model(&user).Association("Cards").Find(&user.Cards)
 	// SQLDB.Debug().Not(User{Status: -1}).Preload("Cards").Find(&user, id).Error
 	// 参考文章：https://segmentfault.com/a/1190000017263285
+	return
+}
+
+// GetUserByName 根据 name 获取 user
+func GetUserByName(name string) (users []User, err error) {
+	err = SQLDB.Not(User{Status: -1}).Where("name = ?", name).Find(&users).Error
+	return
+}
+
+// GetUserByEmail 根据 email 获取 user
+func GetUserByEmail(email string) (users []User, err error) {
+	err = SQLDB.Not(User{Status: -1}).Where("email = ?", email).Find(&users).Error
 	return
 }
 

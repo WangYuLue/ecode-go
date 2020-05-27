@@ -26,3 +26,9 @@ package config
 
 // JWT 私钥，自定义填写
 // var JWTSignKey = "*****"
+
+// 用户激活邮箱 相关配置
+// var EmailConfirm = SEmailConfirm{
+// 	BaseURL:"",
+// 	Title:"",
+// }

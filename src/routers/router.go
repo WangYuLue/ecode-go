@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"ecode/middleware/jwt"
+	"ecode/middlewares/jwt"
 	apis "ecode/routers/apis/v1"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +15,13 @@ func InitRouter() *gin.Engine {
 
 	v1 := router.Group("/v1")
 	{
+		email := v1.Group("/email")
+		{
+			// 邮箱激活
+			email.GET("/:userid/confirm-email/:uuid", apis.ConfirmEmail)
+			// 重新发送激活邮件
+			email.POST(":userid/send-confirm-email/", jwt.Auth(), apis.SendConfirmEmail)
+		}
 		users := v1.Group("/users")
 		{
 			{
@@ -24,20 +31,18 @@ func InitRouter() *gin.Engine {
 				users.POST("/login", apis.Login)
 				// 更新 token
 				users.POST("/token", apis.UpdateToken)
-				// 邮箱激活
-				users.GET("/:id/email-confirm/:uuid", apis.EmailConfirm)
 			}
 			token := users.Group("/", jwt.Auth())
 			{
 				token.GET("/", apis.GetUsersAPI)
 
-				token.GET("/:id", apis.GetUserAPI)
+				token.GET("/:userid", apis.GetUserAPI)
 
-				token.GET("/:id/cards", apis.GetCardsByUserID)
+				token.GET("/:userid/cards", apis.GetCardsByUserID)
 
-				token.PUT("/:id", apis.ModUserAPI)
+				token.PUT("/:userid", apis.ModUserAPI)
 				// 注销用户
-				token.DELETE("/:id", apis.DelUserAPI)
+				token.DELETE("/:userid", apis.DelUserAPI)
 			}
 
 		}
@@ -49,11 +54,11 @@ func InitRouter() *gin.Engine {
 
 				token.GET("/", apis.GetCardsAPI)
 
-				token.GET("/:id", apis.GetCardAPI)
+				token.GET("/:cardid", apis.GetCardAPI)
 
-				token.PUT("/:id", apis.ModCardAPI)
+				token.PUT("/:cardid", apis.ModCardAPI)
 
-				token.DELETE("/:id", apis.DelCardAPI)
+				token.DELETE("/:cardid", apis.DelCardAPI)
 			}
 
 		}
