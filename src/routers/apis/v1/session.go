@@ -3,8 +3,8 @@ package v1
 import (
 	myJwt "ecode/middlewares/jwt"
 	"ecode/models"
-	"ecode/utils"
 	"ecode/utils/md5"
+	"ecode/utils/message"
 	"net/http"
 	"strconv"
 	"time"
@@ -20,36 +20,26 @@ func Login(c *gin.Context) {
 	name := c.PostForm("name")
 	password := c.PostForm("password")
 	if name == "" || password == "" {
-		utils.HandelError(c, utils.StatusBadMessage.Fail.Login)
+		message.HandelError(c, message.ErrHTTPData.BindFail)
+		return
+	}
+	user, err := models.GetUserByName(name)
+	if err != nil {
+		message.HandelError(c, message.ErrUser.NotFound)
 		return
 	}
 	password = md5.Md5(password)
-	user, err := models.Login(name, password)
+	user, err = models.Login(name, password)
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Fail.Login)
+		message.HandelError(c, message.ErrUser.PasswordIncorrect)
 		return
 	}
-	generateToken(c, user)
+	GenerateToken(c, user)
 	return
 }
 
-// UpdateToken 更新token
-func UpdateToken(c *gin.Context) {
-	token := c.PostForm("token")
-	newToken, err := j.RefreshToken(token)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"msg": "令牌更新失败",
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"token": newToken,
-	})
-}
-
-// 生成令牌
-func generateToken(c *gin.Context, user models.UserORM) {
+// GenerateToken 生成令牌
+func GenerateToken(c *gin.Context, user models.User) {
 	claims := myJwt.CustomClaims{
 		ID:    strconv.Itoa(user.ID),
 		Email: user.Email,
@@ -63,16 +53,27 @@ func generateToken(c *gin.Context, user models.UserORM) {
 	token, err := j.CreateToken(claims)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
-		})
+		message.HandelError(c, message.ErrToken.GenerateFail)
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"msg":   "登录成功",
-		"data":  user,
-		"token": token,
+		"message": "登录成功",
+		"data":    user,
+		"token":   token,
 	})
 	return
+}
+
+// UpdateToken 更新token
+func UpdateToken(c *gin.Context) {
+	token := c.PostForm("token")
+	newToken, err := j.RefreshToken(token)
+	if err != nil {
+		message.HandelError(c, message.ErrToken.UpdateFail)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"token": newToken,
+	})
 }

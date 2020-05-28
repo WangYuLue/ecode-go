@@ -2,8 +2,8 @@ package jwt
 
 import (
 	"ecode/config"
+	"ecode/utils/message"
 	"errors"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -22,47 +22,38 @@ var (
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authorization := c.Request.Header.Get("Authorization")
+		if authorization == "" {
+			message.HandelStatusUnauthorizedError(c, message.ErrToken.NoToken)
+			c.Abort()
+			return
+		}
+
 		tokenData := strings.Split(authorization, " ")
 		header := tokenData[0]
 		if len(tokenData) != 2 || header != "Bearer" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"msg": "请求头 Authorization 不合法",
-			})
+			message.HandelStatusUnauthorizedError(c, message.ErrToken.HeaderIllegal)
 			c.Abort()
 			return
 		}
 		token := tokenData[1]
-		if token == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"msg": "请求未携带令牌，无权限访问",
-			})
-			c.Abort()
-			return
-		}
 
 		j := NewJWT()
 		// parseToken 解析token包含的信息
 		claims, err := j.ParseToken(token)
 		if err != nil {
 			if err == errTokenExpired {
-				c.JSON(http.StatusUnauthorized, gin.H{
-					"msg": "令牌已过期",
-				})
+				message.HandelStatusUnauthorizedError(c, message.ErrToken.TokenExpired)
 				c.Abort()
 				return
 			}
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"msg": err.Error(),
-			})
+			message.HandelStatusUnauthorizedError(c, message.ErrToken.Other)
 			c.Abort()
 			return
 		}
 		idInt, _ := strconv.Atoi(claims.ID)
 		// 默认前 100 个用户是管理员
 		if idInt > 100 && claims.ID != c.Param("userid") {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"msg": "当前令牌无权限访问该资源",
-			})
+			message.HandelStatusUnauthorizedError(c, message.ErrToken.NoAccess)
 			c.Abort()
 			return
 		}

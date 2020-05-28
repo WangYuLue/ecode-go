@@ -35,7 +35,7 @@ func InitRouter() *gin.Engine {
 		{
 			{
 				// 注册
-				users.POST("/register", apis.AddUserAPI)
+				users.POST("/register", apis.RegisterAPI)
 				// 登录
 				users.POST("/login", apis.Login)
 				// 更新 token

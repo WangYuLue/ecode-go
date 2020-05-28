@@ -35,20 +35,20 @@ type User struct {
 	Github       string    `json:"github" form:"github"`
 	PersonURL    string    `json:"personURL" form:"personURL"`
 	Email        string    `json:"email" form:"email"`
-	CreatedAt    time.Time `json:"createdAt" form:"createdAt"`
-	UpdatedAt    time.Time `json:"updatedAt" form:"updatedAt"`
+	CreatedAt    time.Time `json:"createdAt" form:"created_at"`
+	UpdatedAt    time.Time `json:"updatedAt" form:"updated_at"`
 }
 
 // Login 用户登录
-func Login(name, password string) (user UserORM, err error) {
+func Login(name, password string) (user User, err error) {
 	queryString := "status = ? AND name = ? AND password = ? AND name <> '' AND password <> ''"
-	err = SQLDB.Where(queryString, 0, name, password).Find(&user).Error
+	err = SQLDB.Table(userTableName).Where(queryString, 0, name, password).Scan(&user).Error
 	return
 }
 
 // AddUser 添加 user
-func AddUser(p *UserORM) (user User, err error) {
-	err = SQLDB.Create(p).Find(&user).Error
+func AddUser(p *UserORM) (err error) {
+	err = SQLDB.Create(p).Error
 	return
 }
 
@@ -81,14 +81,14 @@ func GetUserByID(id int) (user User, err error) {
 }
 
 // GetUserByName 根据 name 获取 user
-func GetUserByName(name string) (users []User, err error) {
-	err = SQLDB.Table(userTableName).Not(UserORM{Status: -1}).Where(UserORM{Name: name}).Scan(&users).Error
+func GetUserByName(name string) (user User, err error) {
+	err = SQLDB.Table(userTableName).Not(UserORM{Status: -1}).Where(UserORM{Name: name}).Scan(&user).Error
 	return
 }
 
 // GetUserByEmail 根据 email 获取 user
-func GetUserByEmail(email string) (users []User, err error) {
-	err = SQLDB.Table(userTableName).Not(UserORM{Status: -1}).Where(UserORM{Email: email}).Scan(&users).Error
+func GetUserByEmail(email string) (user User, err error) {
+	err = SQLDB.Table(userTableName).Not(UserORM{Status: -1}).Where(UserORM{Email: email}).Scan(&user).Error
 	return
 }
 

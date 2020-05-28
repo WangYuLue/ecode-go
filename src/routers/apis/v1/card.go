@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"ecode/models"
-	"ecode/utils"
+	"ecode/utils/message"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,11 +14,11 @@ import (
 func AddCardAPI(c *gin.Context) {
 	var u models.CardORM
 	if c.ShouldBind(&u) != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Illegal.Data)
+		message.HandelError(c, message.ErrHTTPData.BindFail)
 		return
 	}
 	if models.AddCard(&u) != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Fail.Add)
+		message.HandelError(c, message.ErrCard.ADDFail)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -30,7 +30,7 @@ func AddCardAPI(c *gin.Context) {
 func GetCardsAPI(c *gin.Context) {
 	data, err := models.GetCards()
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Fail.Get)
+		message.HandelError(c, message.ErrCard.NotFound)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -42,12 +42,12 @@ func GetCardsAPI(c *gin.Context) {
 func GetCardAPI(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("cardid"))
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
+		message.HandelError(c, message.ErrCard.IDIllegal)
 		return
 	}
 	data, err := models.GetCardByID(id)
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.None.Card)
+		message.HandelError(c, message.ErrCard.NotFound)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -61,17 +61,17 @@ func ModCardAPI(c *gin.Context) {
 	question := c.PostForm("question")
 	answer := c.PostForm("answer")
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
+		message.HandelError(c, message.ErrCard.IDIllegal)
 		return
 	}
 	_, err = models.GetCardByID(id)
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.None.Card)
+		message.HandelError(c, message.ErrCard.NotFound)
 		return
 	}
 	err = models.ModCardByID(id, question, answer)
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Fail.Mod)
+		message.HandelError(c, message.ErrCard.ModFail)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -83,17 +83,17 @@ func ModCardAPI(c *gin.Context) {
 func DelCardAPI(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("cardid"))
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
+		message.HandelError(c, message.ErrCard.IDIllegal)
 		return
 	}
 	_, err = models.GetCardByID(id)
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.None.Card)
+		message.HandelError(c, message.ErrCard.NotFound)
 		return
 	}
 	err = models.DelCardByID(id)
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Fail.Del)
+		message.HandelError(c, message.ErrCard.DelFail)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

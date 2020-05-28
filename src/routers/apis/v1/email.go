@@ -6,6 +6,7 @@ import (
 	"ecode/databases/redis"
 	redisKeys "ecode/databases/redis/keys"
 	"ecode/models"
+	"ecode/utils/message"
 	"net/http"
 	"strconv"
 
@@ -18,23 +19,23 @@ func ConfirmEmail(c *gin.Context) {
 	uuid1 := c.Param("uuid")
 	if id == "" || uuid1 == "" {
 		// 重定向到登录失败页面
-		c.Redirect(http.StatusMovedPermanently, config.EmailConfirm.FailURL+"?msg=激活链接不合法")
+		c.Redirect(http.StatusMovedPermanently, config.EmailConfirm.FailURL+"?message=激活链接不合法")
 		return
 	}
 	uuid2 := redis.DB.HGet(redisKeys.EmailConfirm, id).Val()
 	if uuid1 != uuid2 {
 		// 重定向到登录失败页面
-		c.Redirect(http.StatusMovedPermanently, config.EmailConfirm.FailURL+"?msg=验证失败")
+		c.Redirect(http.StatusMovedPermanently, config.EmailConfirm.FailURL+"?message=验证失败")
 		return
 	}
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		c.Redirect(http.StatusMovedPermanently, config.EmailConfirm.FailURL+"?msg=ID不合法")
+		c.Redirect(http.StatusMovedPermanently, config.EmailConfirm.FailURL+"?message=ID不合法")
 		return
 	}
 	_, err = models.ActiveUser(idInt)
 	if err != nil {
-		c.Redirect(http.StatusMovedPermanently, config.EmailConfirm.FailURL+"?msg=激活失败")
+		c.Redirect(http.StatusMovedPermanently, config.EmailConfirm.FailURL+"?message=激活失败")
 		return
 	}
 	// 重定向到登录成功页面
@@ -45,16 +46,12 @@ func ConfirmEmail(c *gin.Context) {
 func SendConfirmEmail(c *gin.Context) {
 	idInt, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"data": "ID不合法",
-		})
+		message.HandelError(c, message.ErrUser.IDIllegal)
 		return
 	}
 	user, err := models.GetUserByID(idInt)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"data": "用户不存在",
-		})
+		message.HandelError(c, message.ErrUser.NotFound)
 		return
 	}
 	controllers.SendUserConfirmEmail(user)

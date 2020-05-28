@@ -20,9 +20,9 @@ func SendEmail(user, password, host, to, subject, body, mailtype string) error {
 	} else {
 		contentType = "Content-Type: text/plain" + "; charset=UTF-8"
 	}
-	msg := []byte("To: " + to + "\r\nFrom: " + user + "\r\nSubject: " + subject + "\r\n" + contentType + "\r\n\r\n" + body)
+	message := []byte("To: " + to + "\r\nFrom: " + user + "\r\nSubject: " + subject + "\r\n" + contentType + "\r\n\r\n" + body)
 	sendTo := strings.Split(to, ";")
-	err := smtp.SendMail(host, auth, user, sendTo, msg)
+	err := smtp.SendMail(host, auth, user, sendTo, message)
 	return err
 }
 

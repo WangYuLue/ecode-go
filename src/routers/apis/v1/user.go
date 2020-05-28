@@ -7,33 +7,29 @@ import (
 
 	"ecode/controllers"
 	"ecode/models"
-	"ecode/utils"
 	"ecode/utils/md5"
+	"ecode/utils/message"
 
 	"github.com/gin-gonic/gin"
 )
 
-// AddUserAPI 添加 card
-func AddUserAPI(c *gin.Context) {
+// RegisterAPI 注册用户
+func RegisterAPI(c *gin.Context) {
 	// name := c.Request.FormValue("name")
 	nameStr := c.PostForm("name")
 	emailStr := c.PostForm("email")
 	passwordStr := c.PostForm("password")
 	log.Println(nameStr, passwordStr, emailStr)
 	if nameStr == "" || passwordStr == "" || emailStr == "" {
-		utils.HandelError(c, utils.StatusBadMessage.Illegal.Data)
+		message.HandelError(c, message.ErrHTTPData.BindFail)
 		return
 	}
-	if users, err := models.GetUserByName(nameStr); err != nil || len(users) != 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"data": "用户名已存在",
-		})
+	if user, _ := models.GetUserByName(nameStr); user.Name != "" {
+		message.HandelError(c, message.ErrUser.NameExist)
 		return
 	}
-	if users, err := models.GetUserByEmail(emailStr); err != nil || len(users) != 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"data": "邮箱已注册",
-		})
+	if user, _ := models.GetUserByEmail(emailStr); user.Email != "" {
+		message.HandelError(c, message.ErrUser.EmailExist)
 		return
 	}
 	passwordStr = md5.Md5(passwordStr)
@@ -42,43 +38,42 @@ func AddUserAPI(c *gin.Context) {
 		Email:    emailStr,
 		Password: passwordStr,
 	}
-	user, err := models.AddUser(p)
+	err := models.AddUser(p)
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Fail.Add)
+		message.HandelError(c, message.ErrUser.ADDFail)
 		return
 	}
-	controllers.SendUserConfirmEmail(user)
+	controllers.SendUserConfirmEmail(models.User{
+		Name:  nameStr,
+		Email: emailStr,
+	})
 	c.JSON(http.StatusOK, gin.H{
 		"data": "用户注册成功",
 	})
 }
 
-// GetUsersAPI 获取所有 card
+// GetUsersAPI 获取所有 user
 func GetUsersAPI(c *gin.Context) {
 	data, err := models.GetUsers()
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Fail.Get)
+		message.HandelError(c, message.ErrUser.NotFound)
 		return
 	}
-	// out, _ := StructPick(data, models.UserMap)
-	// c.JSON(http.StatusOK, gin.H{
-	// 	"data": out,
-	// })
 	c.JSON(http.StatusOK, gin.H{
 		"data": data,
 	})
 }
 
-// GetUserAPI 根据 ID 获取 card
+// GetUserAPI 根据 ID 获取 user
 func GetUserAPI(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
+		message.HandelError(c, message.ErrUser.IDIllegal)
 		return
 	}
 	data, err := models.GetUserByID(id)
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.None.User)
+		message.HandelError(c, message.ErrUser.NotFound)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -86,16 +81,16 @@ func GetUserAPI(c *gin.Context) {
 	})
 }
 
-// GetCardsByUserID 根据 ID 获取 card
+// GetCardsByUserID 根据 ID 获取 user
 func GetCardsByUserID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
+		message.HandelError(c, message.ErrUser.IDIllegal)
 		return
 	}
 	data, err := models.GetCardsByUserID(id)
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.None.User)
+		message.HandelError(c, message.ErrUser.NotFound)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -108,17 +103,17 @@ func ModUserAPI(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("userid"))
 	name := c.PostForm("name")
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
+		message.HandelError(c, message.ErrUser.IDIllegal)
 		return
 	}
 	_, err = models.GetUserByID(id)
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.None.User)
+		message.HandelError(c, message.ErrUser.NotFound)
 		return
 	}
 	err = models.ModUserByID(id, name)
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Fail.Mod)
+		message.HandelError(c, message.ErrUser.ModFail)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -130,17 +125,17 @@ func ModUserAPI(c *gin.Context) {
 func DelUserAPI(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Illegal.ID)
+		message.HandelError(c, message.ErrUser.IDIllegal)
 		return
 	}
 	_, err = models.GetUserByID(id)
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.None.User)
+		message.HandelError(c, message.ErrUser.NotFound)
 		return
 	}
 	err = models.DelUserByID(id)
 	if err != nil {
-		utils.HandelError(c, utils.StatusBadMessage.Fail.Del)
+		message.HandelError(c, message.ErrUser.DelFail)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
