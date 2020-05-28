@@ -37,7 +37,7 @@ func AddUserAPI(c *gin.Context) {
 		return
 	}
 	passwordStr = md5.Md5(passwordStr)
-	p := &models.User{
+	p := &models.UserORM{
 		Name:     nameStr,
 		Email:    emailStr,
 		Password: passwordStr,
@@ -81,9 +81,8 @@ func GetUserAPI(c *gin.Context) {
 		utils.HandelError(c, utils.StatusBadMessage.None.User)
 		return
 	}
-	out, _ := StructPick(data, models.UserMap)
 	c.JSON(http.StatusOK, gin.H{
-		"data": out,
+		"data": data,
 	})
 }
 

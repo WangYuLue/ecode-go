@@ -21,12 +21,3 @@ func MapLowFirstCase(in models.H) models.H {
 	}
 	return out
 }
-
-// StructPick -
-func StructPick(in interface{}, array []string) (models.H, error) {
-	out, err := lodash.StructToMap(in)
-	if err != nil {
-		return nil, err
-	}
-	return MapLowFirstCase(lodash.Pick(out, array)), nil
-}

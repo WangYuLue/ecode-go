@@ -17,14 +17,14 @@ var j = myJwt.NewJWT()
 
 // Login 登录接口
 func Login(c *gin.Context) {
-	email := c.PostForm("email")
+	name := c.PostForm("name")
 	password := c.PostForm("password")
-	if email == "" || password == "" {
+	if name == "" || password == "" {
 		utils.HandelError(c, utils.StatusBadMessage.Fail.Login)
 		return
 	}
 	password = md5.Md5(password)
-	user, err := models.Login(email, password)
+	user, err := models.Login(name, password)
 	if err != nil {
 		utils.HandelError(c, utils.StatusBadMessage.Fail.Login)
 		return
@@ -49,7 +49,7 @@ func UpdateToken(c *gin.Context) {
 }
 
 // 生成令牌
-func generateToken(c *gin.Context, user models.User) {
+func generateToken(c *gin.Context, user models.UserORM) {
 	claims := myJwt.CustomClaims{
 		ID:    strconv.Itoa(user.ID),
 		Email: user.Email,

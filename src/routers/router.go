@@ -1,20 +1,29 @@
 package routers
 
 import (
+	"ecode/config"
 	"ecode/middlewares/jwt"
 	apis "ecode/routers/apis/v1"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 // InitRouter -
 func InitRouter() *gin.Engine {
 	router := gin.Default()
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowOrigins = []string{config.FrontendURL}
+	corsConfig.AllowHeaders = []string{"Authorization", "Content-Type"}
+
+	router.Use(cors.New(corsConfig))
+	// router.Use(cors.Default())
 
 	router.GET("/", apis.IndexAPI)
 
 	v1 := router.Group("/v1")
 	{
+		v1.GET("/ping", apis.IndexAPI)
 		email := v1.Group("/email")
 		{
 			// 邮箱激活

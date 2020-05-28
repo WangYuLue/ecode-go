@@ -12,7 +12,7 @@ import (
 
 // AddCardAPI 添加卡片
 func AddCardAPI(c *gin.Context) {
-	var u models.Card
+	var u models.CardORM
 	if c.ShouldBind(&u) != nil {
 		utils.HandelError(c, utils.StatusBadMessage.Illegal.Data)
 		return

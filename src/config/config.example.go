@@ -32,3 +32,6 @@ package config
 // 	BaseURL:"",
 // 	Title:"",
 // }
+
+// 前端地址 供 cors 使用
+// var FrontendURL = "http://localhost:8000"
