@@ -1,5 +1,6 @@
 .mysql-data
 .redis-data
-tmp
 .DS_Store
 src/config/config.go
+src/runtime
+src/tmp

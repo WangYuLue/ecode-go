@@ -1,6 +1,7 @@
 package message
 
 import (
+	"ecode/utils/log"
 	"fmt"
 	"net/http"
 
@@ -54,6 +55,7 @@ func DecodeErr(err error) (int, string) {
 }
 
 func handelError(c *gin.Context, code int, errno *Errno) {
+	log.Error(c.ClientIP(), c.Request.URL, errno.Code, errno.Message)
 	c.JSON(code, gin.H{
 		"code":    errno.Code,
 		"message": errno.Message,
