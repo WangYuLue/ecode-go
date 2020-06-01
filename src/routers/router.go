@@ -24,12 +24,16 @@ func InitRouter() *gin.Engine {
 	v1 := router.Group("/v1")
 	{
 		v1.GET("/ping", apis.IndexAPI)
+		// 通过邮箱激活用户
+		v1.GET("confirm-email/:userid/:uuid", apis.ConfirmEmail)
+		// 通过邮箱设置新密码
+		v1.POST("reset-password", apis.ResetPassword)
 		email := v1.Group("/email")
 		{
-			// 邮箱激活
-			email.GET("/:userid/confirm-email/:uuid", apis.ConfirmEmail)
 			// 重新发送激活邮件
-			email.POST(":userid/send-confirm-email/", jwt.Auth(), apis.SendConfirmEmail)
+			email.POST("send-confirm/:userid", jwt.Auth(), apis.SendConfirmEmail)
+			// 想指定邮箱发送设置新密码的链接
+			email.POST("send-reset-password/:email", apis.SendResetPasswordEmail)
 		}
 		users := v1.Group("/users")
 		{
@@ -48,7 +52,7 @@ func InitRouter() *gin.Engine {
 				token.GET("/:userid", apis.GetUserAPI)
 
 				token.GET("/:userid/cards", apis.GetCardsByUserID)
-
+				// 修改用户信息，账户名 密码 等
 				token.PUT("/:userid", apis.ModUserAPI)
 				// 注销用户
 				token.DELETE("/:userid", apis.DelUserAPI)

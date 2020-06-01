@@ -42,12 +42,28 @@ func SendEmailByAdmin(title, html, to string) {
 	}
 }
 
-// GenEmailHTML 生成email模版文件
-func GenEmailHTML(data models.Mail) (string, error) {
+// GenUserConfirmHTML 生成激活用户模版文件
+func GenUserConfirmHTML(data models.Mail) (string, error) {
 	var doc bytes.Buffer
 	var err error
 	var t *template.Template
-	t, err = template.ParseFiles("templates/email.html") //从文件创建一个模板
+	t, err = template.ParseFiles("templates/user-confirm.html")
+	if err != nil {
+		return "", err
+	}
+	err = t.Execute(&doc, data)
+	if err != nil {
+		return "", err
+	}
+	return doc.String(), nil
+}
+
+// GenUserConfirmHTML 生成激活用户模版文件
+func GenResetPasswordHTML(data models.Mail) (string, error) {
+	var doc bytes.Buffer
+	var err error
+	var t *template.Template
+	t, err = template.ParseFiles("templates/reset-password.html")
 	if err != nil {
 		return "", err
 	}

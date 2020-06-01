@@ -22,7 +22,7 @@ func AddCardAPI(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"data": "添加卡片成功",
+		"message": "添加卡片成功",
 	})
 }
 
@@ -75,7 +75,7 @@ func ModCardAPI(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"data": "修改成功",
+		"message": "修改成功",
 	})
 }
 
@@ -97,6 +97,6 @@ func DelCardAPI(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"data": "删除成功",
+		"message": "删除成功",
 	})
 }

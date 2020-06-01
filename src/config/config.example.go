@@ -28,10 +28,14 @@ package config
 // var JWTSignKey = "*****"
 
 // 用户激活邮箱 相关配置
-// var EmailConfirm = SEmailConfirm{
-// 	BaseURL:"",
-// 	Title:"",
+// var EmailConfirmUser = SEmailConfirm{
+// Title:      "ECode 激活邮件",
+// SuccessURL: "http://***.com",
+// FailURL:    "http://***.com",
 // }
+
+// BackendURL 后端线上地址， 发送邮箱时使用
+// var BaseURL =  "http://localhost:8000"
 
 // 前端地址 供 cors 使用
 // var FrontendURL = "http://localhost:8000"

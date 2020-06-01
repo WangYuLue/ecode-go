@@ -1,5 +1,7 @@
 package keys
 
-// EmailConfirm 邮箱激活
-// type: hash
-const EmailConfirm = "EmailConfirm"
+// EmailConfirmUser 邮箱激活
+const EmailConfirmUser = "EmailConfirmUser"
+
+// EmailResetPassword 用户重新设置密码
+const EmailResetPassword = "EmailResetPassword"

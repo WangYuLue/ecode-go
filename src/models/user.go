@@ -29,20 +29,21 @@ func (UserORM) TableName() string {
 
 // User -
 type User struct {
-	ID           int       `json:"id" form:"id"`
+	ID           int       `gorm:"column:user_id" wjson:"id" form:"id"`
 	Name         string    `json:"name" form:"name"`
 	Introduction string    `json:"introduction" form:"introduction"`
 	Github       string    `json:"github" form:"github"`
 	PersonURL    string    `json:"personURL" form:"personURL"`
 	Email        string    `json:"email" form:"email"`
+	Status       int       `json:"status" form:"status"`
 	CreatedAt    time.Time `json:"createdAt" form:"created_at"`
 	UpdatedAt    time.Time `json:"updatedAt" form:"updated_at"`
 }
 
 // Login 用户登录
 func Login(name, password string) (user User, err error) {
-	queryString := "status = ? AND name = ? AND password = ? AND name <> '' AND password <> ''"
-	err = SQLDB.Table(userTableName).Where(queryString, 0, name, password).Scan(&user).Error
+	queryString := "status  <> -1 AND (name = ? OR email = ?) AND password = ? AND name <> '' AND email <> '' AND password <> ''"
+	err = SQLDB.Table(userTableName).Where(queryString, name, name, password).Scan(&user).Error
 	return
 }
 
@@ -106,8 +107,8 @@ func GetCardsByUserID(id int) (cards []CardORM, err error) {
 }
 
 // ModUserByID 根据 ID 修改 user
-func ModUserByID(id int, name string) (err error) {
-	err = SQLDB.Model(UserORM{ID: id}).Update("name", name).Error
+func ModUserByID(id int, user UserORM) (err error) {
+	err = SQLDB.Model(UserORM{ID: id}).Update(user).Error
 	return
 }
 

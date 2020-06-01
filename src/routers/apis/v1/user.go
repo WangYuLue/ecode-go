@@ -48,7 +48,7 @@ func RegisterAPI(c *gin.Context) {
 		Email: emailStr,
 	})
 	c.JSON(http.StatusOK, gin.H{
-		"data": "用户注册成功",
+		"message": "用户注册成功",
 	})
 }
 
@@ -111,13 +111,13 @@ func ModUserAPI(c *gin.Context) {
 		message.HandelError(c, message.ErrUser.NotFound)
 		return
 	}
-	err = models.ModUserByID(id, name)
+	err = models.ModUserByID(id, models.UserORM{Name: name})
 	if err != nil {
 		message.HandelError(c, message.ErrUser.ModFail)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"data": "修改成功",
+		"message": "修改成功",
 	})
 }
 
@@ -139,6 +139,6 @@ func DelUserAPI(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"data": "删除成功",
+		"message": "删除成功",
 	})
 }

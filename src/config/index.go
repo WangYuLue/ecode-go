@@ -24,10 +24,14 @@ type SEmail struct {
 	Host     string
 }
 
-// SEmailConfirm struct
-type SEmailConfirm struct {
-	BaseURL    string // 邮件基础URL
+// SEmailConfirmUser struct
+type SEmailConfirmUser struct {
 	Title      string // 邮件标题
 	SuccessURL string // 验证成功后的跳转
 	FailURL    string // 验证失败后的跳转
+}
+
+// SEmailResetPassword -
+type SEmailResetPassword struct {
+	ResetURL string
 }

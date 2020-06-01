@@ -17,21 +17,26 @@ var j = myJwt.NewJWT()
 
 // Login 登录接口
 func Login(c *gin.Context) {
+	// name 用户名或者邮箱
 	name := c.PostForm("name")
 	password := c.PostForm("password")
 	if name == "" || password == "" {
 		message.HandelError(c, message.ErrHTTPData.BindFail)
 		return
 	}
-	user, err := models.GetUserByName(name)
+	_, err := models.GetUserByName(name)
+	if err != nil {
+		_, err := models.GetUserByEmail(name)
+		if err != nil {
+			message.HandelError(c, message.ErrUser.NotFound)
+			return
+		}
+	}
+
+	password = md5.Md5(password)
+	user, err := models.Login(name, password)
 	if err != nil {
 		message.HandelError(c, message.ErrUser.NotFound)
-		return
-	}
-	password = md5.Md5(password)
-	user, err = models.Login(name, password)
-	if err != nil {
-		message.HandelError(c, message.ErrUser.PasswordIncorrect)
 		return
 	}
 	GenerateToken(c, user)
