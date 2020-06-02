@@ -29,7 +29,7 @@ func (UserORM) TableName() string {
 
 // User -
 type User struct {
-	ID           int       `gorm:"column:user_id" wjson:"id" form:"id"`
+	ID           int       `gorm:"column:user_id" json:"id" form:"id"`
 	Name         string    `json:"name" form:"name"`
 	Introduction string    `json:"introduction" form:"introduction"`
 	Github       string    `json:"github" form:"github"`
@@ -48,8 +48,8 @@ func Login(name, password string) (user User, err error) {
 }
 
 // AddUser 添加 user
-func AddUser(p *UserORM) (err error) {
-	err = SQLDB.Create(p).Error
+func AddUser(p *UserORM) (user UserORM, err error) {
+	err = SQLDB.Create(p).Find(&user).Error
 	return
 }
 

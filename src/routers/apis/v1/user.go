@@ -38,12 +38,13 @@ func RegisterAPI(c *gin.Context) {
 		Email:    emailStr,
 		Password: passwordStr,
 	}
-	err := models.AddUser(p)
+	user, err := models.AddUser(p)
 	if err != nil {
 		message.HandelError(c, message.ErrUser.ADDFail)
 		return
 	}
 	controllers.SendUserConfirmEmail(models.User{
+		ID:    user.ID,
 		Name:  nameStr,
 		Email: emailStr,
 	})

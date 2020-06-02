@@ -20,7 +20,7 @@ type CardORM struct {
 
 // Card -
 type Card struct {
-	ID        int       `json:"id" form:"id"`
+	ID        int       `gorm:"column:user_id" json:"id" form:"id"`
 	Question  string    `json:"question" form:"question"`
 	Answer    string    `json:"answer" form:"answer"`
 	AutherID  int       `json:"auther_id" form:"auther_id"`

@@ -16,7 +16,7 @@ import (
 func SendUserConfirmEmail(user models.User) {
 	uuidStr := uuid.Must(uuid.NewV4()).String()
 	redis.DB.HSet(redisKeys.EmailConfirmUser, strconv.Itoa(user.ID), uuidStr)
-	confirmURL := config.BaseURL + "/v1/email/confirm-email/" + strconv.Itoa(user.ID) + "/" + uuidStr
+	confirmURL := config.BaseURL + "/v1/confirm-email/" + strconv.Itoa(user.ID) + "/" + uuidStr
 	data := models.Mail{Name: user.Name, URL: confirmURL}
 	emailTemplete, err := email.GenUserConfirmHTML(data)
 	if err != nil {

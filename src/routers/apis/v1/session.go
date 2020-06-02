@@ -36,7 +36,7 @@ func Login(c *gin.Context) {
 	password = md5.Md5(password)
 	user, err := models.Login(name, password)
 	if err != nil {
-		message.HandelError(c, message.ErrUser.NotFound)
+		message.HandelError(c, message.ErrUser.PasswordIncorrect)
 		return
 	}
 	GenerateToken(c, user)
