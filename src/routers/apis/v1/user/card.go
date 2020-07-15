@@ -1,4 +1,4 @@
-package v1
+package user
 
 import (
 	"net/http"
@@ -10,13 +10,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AddCardAPI 添加卡片
-func AddCardAPI(c *gin.Context) {
+// AddCard 添加卡片
+func AddCard(c *gin.Context) {
 	var u models.CardORM
 	if c.ShouldBind(&u) != nil {
 		message.HandelError(c, message.ErrHTTPData.BindFail)
 		return
 	}
+	userid, err := strconv.Atoi(c.Param("userid"))
+	if err != nil {
+		message.HandelError(c, message.ErrUser.IDIllegal)
+		return
+	}
+	u.AutherID = userid
 	if models.AddCard(&u) != nil {
 		message.HandelError(c, message.ErrCard.ADDFail)
 		return
@@ -26,9 +32,14 @@ func AddCardAPI(c *gin.Context) {
 	})
 }
 
-// GetCardsAPI 获取所有卡片
-func GetCardsAPI(c *gin.Context) {
-	data, err := models.GetCards()
+// GetCards 获取所有卡片
+func GetCards(c *gin.Context) {
+	userid, err := strconv.Atoi(c.Param("userid"))
+	if err != nil {
+		message.HandelError(c, message.ErrUser.IDIllegal)
+		return
+	}
+	data, err := models.GetPrivateCards(userid)
 	if err != nil {
 		message.HandelError(c, message.ErrCard.NotFound)
 		return
@@ -38,14 +49,19 @@ func GetCardsAPI(c *gin.Context) {
 	})
 }
 
-// GetCardAPI 根据 ID 获取卡片
-func GetCardAPI(c *gin.Context) {
+// GetCard 根据 ID 获取卡片
+func GetCard(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("cardid"))
 	if err != nil {
 		message.HandelError(c, message.ErrCard.IDIllegal)
 		return
 	}
-	data, err := models.GetCardByID(id)
+	userid, err := strconv.Atoi(c.Param("userid"))
+	if err != nil {
+		message.HandelError(c, message.ErrUser.IDIllegal)
+		return
+	}
+	data, err := models.GetPrivateCardByID(userid, id)
 	if err != nil {
 		message.HandelError(c, message.ErrCard.NotFound)
 		return
@@ -55,16 +71,22 @@ func GetCardAPI(c *gin.Context) {
 	})
 }
 
-// ModCardAPI 修改卡片
-func ModCardAPI(c *gin.Context) {
+// ModCard 修改卡片
+func ModCard(c *gin.Context) {
+	userid, err := strconv.Atoi(c.Param("userid"))
+	if err != nil {
+		message.HandelError(c, message.ErrUser.IDIllegal)
+		return
+	}
 	id, err := strconv.Atoi(c.Param("cardid"))
+	if err != nil {
+		message.HandelError(c, message.ErrCard.IDIllegal)
+		return
+	}
 	question := c.PostForm("question")
 	answer := c.PostForm("answer")
-	if err != nil {
-		message.HandelError(c, message.ErrCard.IDIllegal)
-		return
-	}
-	_, err = models.GetCardByID(id)
+
+	_, err = models.GetPrivateCardByID(userid, id)
 	if err != nil {
 		message.HandelError(c, message.ErrCard.NotFound)
 		return
@@ -79,14 +101,19 @@ func ModCardAPI(c *gin.Context) {
 	})
 }
 
-// DelCardAPI 删除卡片
-func DelCardAPI(c *gin.Context) {
+// DelCard 删除卡片
+func DelCard(c *gin.Context) {
+	userid, err := strconv.Atoi(c.Param("userid"))
+	if err != nil {
+		message.HandelError(c, message.ErrUser.IDIllegal)
+		return
+	}
 	id, err := strconv.Atoi(c.Param("cardid"))
 	if err != nil {
 		message.HandelError(c, message.ErrCard.IDIllegal)
 		return
 	}
-	_, err = models.GetCardByID(id)
+	_, err = models.GetPrivateCardByID(userid, id)
 	if err != nil {
 		message.HandelError(c, message.ErrCard.NotFound)
 		return

@@ -1,4 +1,4 @@
-package v1
+package user
 
 import (
 	"log"
@@ -14,7 +14,7 @@ import (
 )
 
 // RegisterAPI 注册用户
-func RegisterAPI(c *gin.Context) {
+func Register(c *gin.Context) {
 	// name := c.Request.FormValue("name")
 	nameStr := c.PostForm("name")
 	emailStr := c.PostForm("email")
@@ -54,7 +54,7 @@ func RegisterAPI(c *gin.Context) {
 }
 
 // GetUsersAPI 获取所有 user
-func GetUsersAPI(c *gin.Context) {
+func GetUsers(c *gin.Context) {
 	data, err := models.GetUsers()
 	if err != nil {
 		message.HandelError(c, message.ErrUser.NotFound)
@@ -66,7 +66,7 @@ func GetUsersAPI(c *gin.Context) {
 }
 
 // GetUserAPI 根据 ID 获取 user
-func GetUserAPI(c *gin.Context) {
+func GetUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
 		message.HandelError(c, message.ErrUser.IDIllegal)
@@ -100,7 +100,7 @@ func GetCardsByUserID(c *gin.Context) {
 }
 
 // ModUserAPI 修改用户
-func ModUserAPI(c *gin.Context) {
+func ModUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("userid"))
 	name := c.PostForm("name")
 	if err != nil {
@@ -123,7 +123,7 @@ func ModUserAPI(c *gin.Context) {
 }
 
 // DelUserAPI 删除用户
-func DelUserAPI(c *gin.Context) {
+func DelUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
 		message.HandelError(c, message.ErrUser.IDIllegal)

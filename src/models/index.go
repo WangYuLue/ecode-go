@@ -13,4 +13,5 @@ type Mail struct {
 	URL  string
 }
 
+// H h
 type H map[string]interface{}
