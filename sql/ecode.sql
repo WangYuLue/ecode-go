@@ -23,6 +23,7 @@ w
 CREATE TABLE `card`
 (
  `card_id`    int unsigned NOT NULL AUTO_INCREMENT ,
+ `fork_from_card_id` int unsigned NULL ,
  `question`   varchar(100) NOT NULL ,
  `answer`     text NOT NULL ,
  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
@@ -32,7 +33,7 @@ CREATE TABLE `card`
  `data`       text NULL ,
 
 PRIMARY KEY (`card_id`),
-CONSTRAINT `FK_card_user_id` FOREIGN KEY (`auther_id`) REFERENCES `user` (`user_id`)
+CONSTRAINT `FK_card_auther_id` FOREIGN KEY (`auther_id`) REFERENCES `user` (`user_id`)
 ) COMMENT='问题表' CHARSET=utf8mb4;
 
 -- 标签表
@@ -44,9 +45,11 @@ CREATE TABLE `tag`
  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  `status`     tinyint NOT NULL DEFAULT 0 ,
+ `auther_id`   int unsigned NOT NULL ,
  `data`       text NULL ,
 
 PRIMARY KEY (`tag_id`)
+CONSTRAINT `FK_tag_auther_id` FOREIGN KEY (`auther_id`) REFERENCES `user` (`user_id`)
 ) CHARSET=utf8mb4;
 
 -- 分类表
@@ -58,11 +61,11 @@ CREATE TABLE `category`
  `created_at`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  `updated_at`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  `status`      tinyint NOT NULL DEFAULT 0 ,
- `user_id`     int unsigned NOT NULL ,
+ `auther_id`   int unsigned NOT NULL ,
  `data`        text NULL ,
 
 PRIMARY KEY (`category_id`),
-CONSTRAINT `FK_category_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
+CONSTRAINT `FK_category_auther_id` FOREIGN KEY (`auther_id`) REFERENCES `user` (`user_id`)
 ) CHARSET=utf8mb4;
 
 
@@ -120,9 +123,8 @@ CREATE TABLE `comment`
  `id`                int unsigned NOT NULL AUTO_INCREMENT ,
  `card_id`           int unsigned NOT NULL ,
  `target_comment_id` int unsigned NULL ,
- `user_id`           int unsigned NOT NULL ,
+ `auther_id`         int unsigned NOT NULL ,
  `content`           text NOT NULL ,
- `like_count`        int NOT NULL DEFAULT 0 COMMENT '评论被点赞的数量' ,
  `status`            tinyint NOT NULL DEFAULT 0 ,
  `created_at`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  `updated_at`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
@@ -130,7 +132,7 @@ CREATE TABLE `comment`
 
 PRIMARY KEY (`id`),
 CONSTRAINT `comment_id` FOREIGN KEY (`target_comment_id`) REFERENCES `comment` (`id`),
-CONSTRAINT `comment_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+CONSTRAINT `comment_auther_id` FOREIGN KEY (`auther_id`) REFERENCES `user` (`user_id`),
 CONSTRAINT `comment_card_id` FOREIGN KEY (`card_id`) REFERENCES `card` (`card_id`)
 ) CHARSET=utf8mb4;
 
