@@ -13,7 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// RegisterAPI 注册用户
+// Register 注册用户
 func Register(c *gin.Context) {
 	// name := c.Request.FormValue("name")
 	nameStr := c.PostForm("name")
@@ -53,7 +53,7 @@ func Register(c *gin.Context) {
 	})
 }
 
-// GetUsersAPI 获取所有 user
+// GetUsers 获取所有 user
 func GetUsers(c *gin.Context) {
 	data, err := models.GetUsers()
 	if err != nil {
@@ -65,7 +65,7 @@ func GetUsers(c *gin.Context) {
 	})
 }
 
-// GetUserAPI 根据 ID 获取 user
+// GetUser 根据 ID 获取 user
 func GetUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
@@ -99,7 +99,7 @@ func GetCardsByUserID(c *gin.Context) {
 	})
 }
 
-// ModUserAPI 修改用户
+// ModUser 修改用户
 func ModUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("userid"))
 	name := c.PostForm("name")
@@ -122,7 +122,7 @@ func ModUser(c *gin.Context) {
 	})
 }
 
-// DelUserAPI 删除用户
+// DelUser 删除用户
 func DelUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {

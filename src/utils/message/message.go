@@ -98,3 +98,21 @@ var ErrCard = SErrCard{
 	NotFound:  &Errno{Code: 50204, Message: "卡片不存在"},
 	IDIllegal: &Errno{Code: 50207, Message: "卡片ID不合法"},
 }
+
+// ErrCategory -
+var ErrCategory = SErrCard{
+	ADDFail:   &Errno{Code: 50301, Message: "分类添加异常"},
+	DelFail:   &Errno{Code: 50302, Message: "分类删除异常"},
+	ModFail:   &Errno{Code: 50303, Message: "分类修改异常"},
+	NotFound:  &Errno{Code: 50304, Message: "分类不存在"},
+	IDIllegal: &Errno{Code: 50307, Message: "分类ID不合法"},
+}
+
+// ErrTag -
+var ErrTag = SErrCard{
+	ADDFail:   &Errno{Code: 50401, Message: "标签添加异常"},
+	DelFail:   &Errno{Code: 50402, Message: "标签删除异常"},
+	ModFail:   &Errno{Code: 50403, Message: "标签修改异常"},
+	NotFound:  &Errno{Code: 50404, Message: "标签不存在"},
+	IDIllegal: &Errno{Code: 50407, Message: "标签ID不合法"},
+}

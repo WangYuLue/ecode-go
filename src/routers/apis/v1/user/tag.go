@@ -1,7 +1,6 @@
 package user
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -11,63 +10,38 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AddCard 添加卡片
-func AddCard(c *gin.Context) {
-	var u models.CardORM
-
+// AddTag 添加标签
+func AddTag(c *gin.Context) {
+	var u models.TagORM
 	if c.ShouldBind(&u) != nil {
 		message.HandelError(c, message.ErrHTTPData.BindFail)
 		return
 	}
-	log.Print(u.Question == "")
-	log.Print(u.Answer == "")
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
 		message.HandelError(c, message.ErrUser.IDIllegal)
 		return
 	}
 	u.AutherID = userid
-	if models.AddCard(&u) != nil {
-		message.HandelError(c, message.ErrCard.ADDFail)
+	if models.AddTag(&u) != nil {
+		message.HandelError(c, message.ErrTag.ADDFail)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "发布卡片成功",
+		"message": "发布标签成功",
 	})
 }
 
-// GetCards 获取所有卡片
-func GetCards(c *gin.Context) {
+// GetTags 获取所有标签
+func GetTags(c *gin.Context) {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
 		message.HandelError(c, message.ErrUser.IDIllegal)
 		return
 	}
-	data, err := models.GetPrivateCards(userid)
+	data, err := models.GetPrivateTags(userid)
 	if err != nil {
-		message.HandelError(c, message.ErrCard.NotFound)
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"data": data,
-	})
-}
-
-// GetCard 根据 ID 获取卡片
-func GetCard(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("cardid"))
-	if err != nil {
-		message.HandelError(c, message.ErrCard.IDIllegal)
-		return
-	}
-	userid, err := strconv.Atoi(c.Param("userid"))
-	if err != nil {
-		message.HandelError(c, message.ErrUser.IDIllegal)
-		return
-	}
-	data, err := models.GetPrivateCardByID(userid, id)
-	if err != nil {
-		message.HandelError(c, message.ErrCard.NotFound)
+		message.HandelError(c, message.ErrTag.NotFound)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -75,29 +49,50 @@ func GetCard(c *gin.Context) {
 	})
 }
 
-// ModCard 修改卡片
-func ModCard(c *gin.Context) {
+// GetTag 根据 ID 获取标签
+func GetTag(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("tagid"))
+	if err != nil {
+		message.HandelError(c, message.ErrTag.IDIllegal)
+		return
+	}
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
 		message.HandelError(c, message.ErrUser.IDIllegal)
 		return
 	}
-	id, err := strconv.Atoi(c.Param("cardid"))
+	data, err := models.GetPrivateTagByID(userid, id)
 	if err != nil {
-		message.HandelError(c, message.ErrCard.IDIllegal)
+		message.HandelError(c, message.ErrTag.NotFound)
 		return
 	}
-	question := c.PostForm("question")
-	answer := c.PostForm("answer")
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
+}
 
-	_, err = models.GetPrivateCardByID(userid, id)
+// ModTag 修改标签
+func ModTag(c *gin.Context) {
+	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		message.HandelError(c, message.ErrCard.NotFound)
+		message.HandelError(c, message.ErrUser.IDIllegal)
 		return
 	}
-	err = models.ModCardByID(id, question, answer)
+	id, err := strconv.Atoi(c.Param("tagid"))
 	if err != nil {
-		message.HandelError(c, message.ErrCard.ModFail)
+		message.HandelError(c, message.ErrTag.IDIllegal)
+		return
+	}
+	name := c.PostForm("name")
+
+	_, err = models.GetPrivateTagByID(userid, id)
+	if err != nil {
+		message.HandelError(c, message.ErrTag.NotFound)
+		return
+	}
+	err = models.ModTagByID(id, name)
+	if err != nil {
+		message.HandelError(c, message.ErrTag.ModFail)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -105,26 +100,26 @@ func ModCard(c *gin.Context) {
 	})
 }
 
-// DelCard 删除卡片
-func DelCard(c *gin.Context) {
+// DelTag 删除标签
+func DelTag(c *gin.Context) {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
 		message.HandelError(c, message.ErrUser.IDIllegal)
 		return
 	}
-	id, err := strconv.Atoi(c.Param("cardid"))
+	id, err := strconv.Atoi(c.Param("tagid"))
 	if err != nil {
-		message.HandelError(c, message.ErrCard.IDIllegal)
+		message.HandelError(c, message.ErrTag.IDIllegal)
 		return
 	}
-	_, err = models.GetPrivateCardByID(userid, id)
+	_, err = models.GetPrivateTagByID(userid, id)
 	if err != nil {
-		message.HandelError(c, message.ErrCard.NotFound)
+		message.HandelError(c, message.ErrTag.NotFound)
 		return
 	}
-	err = models.DelCardByID(id)
+	err = models.DelTagByID(id)
 	if err != nil {
-		message.HandelError(c, message.ErrCard.DelFail)
+		message.HandelError(c, message.ErrTag.DelFail)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

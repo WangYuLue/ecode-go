@@ -59,6 +59,7 @@ func InitRouter() *gin.Engine {
 
 				cards := token.Group("/:userid/cards")
 				{
+					// TODO: 根据 catogory , card 查 cards
 					cards.GET("/", UserAPIs.GetCards)
 
 					cards.POST("/", UserAPIs.AddCard)
@@ -68,6 +69,32 @@ func InitRouter() *gin.Engine {
 					cards.PUT("/:cardid", UserAPIs.ModCard)
 
 					cards.DELETE("/:cardid", UserAPIs.DelCard)
+				}
+
+				categorys := token.Group("/:userid/categorys")
+				{
+					categorys.GET("/", UserAPIs.GetCategorys)
+
+					categorys.POST("/", UserAPIs.AddCategory)
+
+					categorys.GET("/:categoryid", UserAPIs.GetCategory)
+
+					categorys.PUT("/:categoryid", UserAPIs.ModCategory)
+
+					categorys.DELETE("/:categoryid", UserAPIs.DelCategory)
+				}
+
+				tags := token.Group("/:userid/tags")
+				{
+					tags.GET("/", UserAPIs.GetTags)
+
+					tags.POST("/", UserAPIs.AddTag)
+
+					tags.GET("/:tagid", UserAPIs.GetTag)
+
+					tags.PUT("/:tagid", UserAPIs.ModTag)
+
+					tags.DELETE("/:tagid", UserAPIs.DelTag)
 				}
 			}
 		}
