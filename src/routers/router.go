@@ -96,6 +96,15 @@ func InitRouter() *gin.Engine {
 
 					tags.DELETE("/:tagid", UserAPIs.DelTag)
 				}
+
+				// 将卡片添加到分类
+				token.POST("/:userid/addCardToCategory", UserAPIs.AddCardToCategory)
+				// 将卡片移除到分类
+				token.POST("/:userid/removeCardToCategory", UserAPIs.RemoveCardToCategory)
+				// 将卡片添加到标签
+				token.POST("/:userid/addCardToTag", UserAPIs.AddCardToTag)
+				// 将卡片移除到标签
+				token.POST("/:userid/removeCardToTag", UserAPIs.RemoveCardToTag)
 			}
 		}
 		cards := v1.Group("/cards")

@@ -126,3 +126,19 @@ func DelTag(c *gin.Context) {
 		"message": "删除成功",
 	})
 }
+
+// AddCardToTag -
+func AddCardToTag(c *gin.Context) {
+	// TODO:
+	c.JSON(http.StatusOK, gin.H{
+		"message": "添加成功",
+	})
+}
+
+// RemoveCardToTag -
+func RemoveCardToTag(c *gin.Context) {
+	// TODO:
+	c.JSON(http.StatusOK, gin.H{
+		"message": "移除成功",
+	})
+}

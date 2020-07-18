@@ -126,3 +126,21 @@ func DelCategory(c *gin.Context) {
 		"message": "删除成功",
 	})
 }
+
+// AddCardToCategory -
+func AddCardToCategory(c *gin.Context) {
+	// cardid := c.PostForm("cardid")
+	// categoryid := c.PostForm("categoryid")
+	// TODO:
+	c.JSON(http.StatusOK, gin.H{
+		"message": "添加成功",
+	})
+}
+
+// RemoveCardToCategory -
+func RemoveCardToCategory(c *gin.Context) {
+	// TODO:
+	c.JSON(http.StatusOK, gin.H{
+		"message": "移除成功",
+	})
+}
