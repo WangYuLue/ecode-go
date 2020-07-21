@@ -44,16 +44,22 @@ var ErrToken = SErrToken{
 // SErrHTTPData 查询数据格式错误 前缀是 301  =========================
 type SErrHTTPData struct {
 	BindFail *Errno
+	Illegal  *Errno
+	AddFail  *Errno
+	DelFail  *Errno
 }
 
 // ErrHTTPData -
 var ErrHTTPData = SErrHTTPData{
 	BindFail: &Errno{Code: 30101, Message: "请求数据格式异常"},
+	Illegal:  &Errno{Code: 30102, Message: "请求数据不合法"},
+	AddFail:  &Errno{Code: 30103, Message: "添加失败"},
+	DelFail:  &Errno{Code: 30104, Message: "删除失败"},
 }
 
 // SErrUser 用户错误, 前缀为 501  ====================================
 type SErrUser struct {
-	ADDFail           *Errno
+	AddFail           *Errno
 	DelFail           *Errno
 	ModFail           *Errno
 	NotFound          *Errno
@@ -68,7 +74,7 @@ type SErrUser struct {
 
 // ErrUser -
 var ErrUser = SErrUser{
-	ADDFail:           &Errno{Code: 50101, Message: "用户添加异常"},
+	AddFail:           &Errno{Code: 50101, Message: "用户添加异常"},
 	DelFail:           &Errno{Code: 50102, Message: "用户删除异常"},
 	ModFail:           &Errno{Code: 50103, Message: "用户修改异常"},
 	NotFound:          &Errno{Code: 50104, Message: "用户不存在"},
@@ -83,7 +89,7 @@ var ErrUser = SErrUser{
 
 // SErrCard 卡片错误, 前缀为 502 ===================================
 type SErrCard struct {
-	ADDFail   *Errno
+	AddFail   *Errno
 	DelFail   *Errno
 	ModFail   *Errno
 	NotFound  *Errno
@@ -92,27 +98,57 @@ type SErrCard struct {
 
 // ErrCard -
 var ErrCard = SErrCard{
-	ADDFail:   &Errno{Code: 50201, Message: "卡片添加异常"},
+	AddFail:   &Errno{Code: 50201, Message: "卡片添加异常"},
 	DelFail:   &Errno{Code: 50202, Message: "卡片删除异常"},
 	ModFail:   &Errno{Code: 50203, Message: "卡片修改异常"},
 	NotFound:  &Errno{Code: 50204, Message: "卡片不存在"},
 	IDIllegal: &Errno{Code: 50207, Message: "卡片ID不合法"},
 }
 
+// SErrCategory 卡片错误, 前缀为 503 ===================================
+type SErrCategory struct {
+	AddFail   *Errno
+	DelFail   *Errno
+	ModFail   *Errno
+	NotFound  *Errno
+	IDIllegal *Errno
+}
+
 // ErrCategory -
-var ErrCategory = SErrCard{
-	ADDFail:   &Errno{Code: 50301, Message: "分类添加异常"},
+var ErrCategory = SErrCategory{
+	AddFail:   &Errno{Code: 50301, Message: "分类添加异常"},
 	DelFail:   &Errno{Code: 50302, Message: "分类删除异常"},
 	ModFail:   &Errno{Code: 50303, Message: "分类修改异常"},
 	NotFound:  &Errno{Code: 50304, Message: "分类不存在"},
 	IDIllegal: &Errno{Code: 50307, Message: "分类ID不合法"},
 }
 
+// SErrTag 卡片错误, 前缀为 504 ===================================
+type SErrTag struct {
+	AddFail   *Errno
+	DelFail   *Errno
+	ModFail   *Errno
+	NotFound  *Errno
+	IDIllegal *Errno
+}
+
 // ErrTag -
-var ErrTag = SErrCard{
-	ADDFail:   &Errno{Code: 50401, Message: "标签添加异常"},
+var ErrTag = SErrTag{
+	AddFail:   &Errno{Code: 50401, Message: "标签添加异常"},
 	DelFail:   &Errno{Code: 50402, Message: "标签删除异常"},
 	ModFail:   &Errno{Code: 50403, Message: "标签修改异常"},
 	NotFound:  &Errno{Code: 50404, Message: "标签不存在"},
 	IDIllegal: &Errno{Code: 50407, Message: "标签ID不合法"},
+}
+
+// SErrCardCategory 卡片错误, 前缀为 504 ===================================
+type SErrCardCategory struct {
+	HasAdd *Errno
+	HasDel *Errno
+}
+
+// ErrCardCategory -
+var ErrCardCategory = SErrCardCategory{
+	HasAdd: &Errno{Code: 51101, Message: "已添加"},
+	HasDel: &Errno{Code: 51102, Message: "已删除"},
 }

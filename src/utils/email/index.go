@@ -1,75 +1,73 @@
 package email
 
 import (
-	"bytes"
 	"ecode/config"
+	"ecode/databases/redis"
+	redisKeys "ecode/databases/redis/keys"
 	"ecode/models"
-	"fmt"
-	"html/template"
-	"net/smtp"
-	"strings"
+	"log"
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gofrs/uuid"
 )
 
-// SendEmail 发送邮件
-func SendEmail(user, password, host, to, subject, body, mailtype string) error {
-	hp := strings.Split(host, ":")
-	auth := smtp.PlainAuth("", user, password, hp[0])
-	var contentType string
-	if mailtype == "html" {
-		contentType = "Content-Type: text/" + mailtype + "; charset=UTF-8"
+// ConfirmEmail 邮箱激活用户
+func ConfirmEmail(c *gin.Context) {
+	id := c.Param("userid")
+	uuid1 := c.Param("uuid")
+	if id == "" || uuid1 == "" {
+		// 重定向到登录失败页面
+		c.Redirect(http.StatusMovedPermanently, config.EmailConfirmUser.FailURL+"?message=激活链接不合法")
+		return
+	}
+	uuid2 := redis.DB.HGet(redisKeys.EmailConfirmUser, id).Val()
+	if uuid1 != uuid2 {
+		// 重定向到登录失败页面
+		c.Redirect(http.StatusMovedPermanently, config.EmailConfirmUser.FailURL+"?message=验证失败")
+		return
+	}
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		c.Redirect(http.StatusMovedPermanently, config.EmailConfirmUser.FailURL+"?message=ID不合法")
+		return
+	}
+	_, err = models.ActiveUser(idInt)
+	if err != nil {
+		c.Redirect(http.StatusMovedPermanently, config.EmailConfirmUser.FailURL+"?message=激活失败")
+		return
+	}
+	// 重定向到登录成功页面
+	c.Redirect(http.StatusMovedPermanently, config.EmailConfirmUser.SuccessURL)
+}
+
+// SendUserConfirmEmail 向刚注册的用户发送激活邮件
+func SendUserConfirmEmail(user models.User) {
+	uuidStr := uuid.Must(uuid.NewV4()).String()
+	redis.DB.HSet(redisKeys.EmailConfirmUser, strconv.Itoa(user.ID), uuidStr)
+	confirmURL := config.BaseURL + "/v1/confirm-email/" + strconv.Itoa(user.ID) + "/" + uuidStr
+	data := models.Mail{Name: user.Name, URL: confirmURL}
+	emailTemplete, err := GenUserConfirmHTML(data)
+	if err != nil {
+		log.Println("邮件模版生成异常")
 	} else {
-		contentType = "Content-Type: text/plain" + "; charset=UTF-8"
+		// 发送用户激活邮件
+		go SendEmailByAdmin(config.EmailConfirmUser.Title, emailTemplete, user.Email)
 	}
-	message := []byte("To: " + to + "\r\nFrom: " + user + "\r\nSubject: " + subject + "\r\n" + contentType + "\r\n\r\n" + body)
-	sendTo := strings.Split(to, ";")
-	err := smtp.SendMail(host, auth, user, sendTo, message)
-	return err
 }
 
-// SendEmailByAdmin 管理员发送邮件
-func SendEmailByAdmin(title, html, to string) {
-	user := config.Email.User
-	password := config.Email.Password
-	host := config.Email.Host
-
-	fmt.Println("邮件发送中...")
-	err := SendEmail(user, password, host, to, title, html, "html")
+// SendResetPasswordEmail 发送重新设置密码邮件
+func SendResetPasswordEmail(user models.User) {
+	uuidStr := uuid.Must(uuid.NewV4()).String()
+	redis.DB.HSet(redisKeys.EmailResetPassword, strconv.Itoa(user.ID), uuidStr)
+	resetPasswordURL := config.EmailResetPassword.ResetURL + "?id=" + strconv.Itoa(user.ID) + "&uuid=" + uuidStr
+	data := models.Mail{Name: user.Name, URL: resetPasswordURL}
+	emailTemplete, err := GenResetPasswordHTML(data)
 	if err != nil {
-		fmt.Println("邮件发送失败")
-		fmt.Println(err)
+		log.Println("重置密码模版生成异常")
 	} else {
-		fmt.Println("邮件发送成功")
+		// 发送用户激活邮件
+		go SendEmailByAdmin(config.EmailConfirmUser.Title, emailTemplete, user.Email)
 	}
-}
-
-// GenUserConfirmHTML 生成激活用户模版文件
-func GenUserConfirmHTML(data models.Mail) (string, error) {
-	var doc bytes.Buffer
-	var err error
-	var t *template.Template
-	t, err = template.ParseFiles("templates/user-confirm.html")
-	if err != nil {
-		return "", err
-	}
-	err = t.Execute(&doc, data)
-	if err != nil {
-		return "", err
-	}
-	return doc.String(), nil
-}
-
-// GenUserConfirmHTML 生成激活用户模版文件
-func GenResetPasswordHTML(data models.Mail) (string, error) {
-	var doc bytes.Buffer
-	var err error
-	var t *template.Template
-	t, err = template.ParseFiles("templates/reset-password.html")
-	if err != nil {
-		return "", err
-	}
-	err = t.Execute(&doc, data)
-	if err != nil {
-		return "", err
-	}
-	return doc.String(), nil
 }

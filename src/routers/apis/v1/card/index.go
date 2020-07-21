@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	C "ecode/controllers/card"
 	"ecode/models"
 	"ecode/utils/message"
 
@@ -12,14 +13,12 @@ import (
 
 // GetCards 获取所有卡片
 func GetCards(c *gin.Context) {
-	data, err := models.GetPublicCards()
-	if err != nil {
-		message.HandelError(c, message.ErrCard.NotFound)
-		return
+	data, err := C.GetCards(c)
+	if err == nil {
+		c.JSON(http.StatusOK, gin.H{
+			"data": data,
+		})
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"data": data,
-	})
 }
 
 // GetCard 根据 ID 获取卡片
