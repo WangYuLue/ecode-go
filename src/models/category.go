@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"time"
 )
 
@@ -40,6 +41,9 @@ func AddCategory(p *CategoryORM) (err error) {
 // GetPublicCategoryByID 根据 ID 获取【公开的】 category
 func GetPublicCategoryByID(id int) (category Category, err error) {
 	err = SQLDB.Table(categotyTableName).Where("status = ?", "0").Where(CategoryORM{ID: id}).Scan(&category).Error
+	if err == nil && category.ID == 0 {
+		err = errors.New("catagory not find")
+	}
 	return
 }
 
@@ -52,6 +56,9 @@ func GetPrivateCategorys(autherID int) (category []Category, err error) {
 // GetPrivateCategoryByID 根据 ID 获取【私有的】 category
 func GetPrivateCategoryByID(autherID int, id int) (category Category, err error) {
 	err = SQLDB.Table(categotyTableName).Where(CategoryORM{AutherID: autherID}).Where("status = ?", "0").Where(CategoryORM{ID: id}).Scan(&category).Error
+	if err == nil && category.ID == 0 {
+		err = errors.New("catagory not find")
+	}
 	return
 }
 

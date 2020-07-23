@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"time"
 )
 
@@ -51,6 +52,9 @@ func GetPublicCards() (cards []Card, err error) {
 // GetPublicCardByID 根据 ID 获取【公开的】 card
 func GetPublicCardByID(id int) (card Card, err error) {
 	err = SQLDB.Table(cardTableName).Where("status = ?", "0").Where(CardORM{ID: id}).Scan(&card).Error
+	if err == nil && card.ID == 0 {
+		err = errors.New("card not find")
+	}
 	return
 }
 
@@ -63,6 +67,9 @@ func GetPrivateCards(autherID int) (cards []Card, err error) {
 // GetPrivateCardByID 根据 ID 获取【私有的】 card
 func GetPrivateCardByID(autherID int, id int) (card Card, err error) {
 	err = SQLDB.Table(cardTableName).Where(CardORM{AutherID: autherID}).Where("status = ?", "0").Where(CardORM{ID: id}).Scan(&card).Error
+	if err == nil && card.ID == 0 {
+		err = errors.New("card not find")
+	}
 	return
 }
 

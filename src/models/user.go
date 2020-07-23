@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"time"
 )
 
@@ -44,6 +45,9 @@ type User struct {
 func Login(name, password string) (user User, err error) {
 	queryString := "status  <> -1 AND (name = ? OR email = ?) AND password = ? AND name <> '' AND email <> '' AND password <> ''"
 	err = SQLDB.Table(userTableName).Where(queryString, name, name, password).Scan(&user).Error
+	if user.ID == 0 {
+		err = errors.New("user not find")
+	}
 	return
 }
 
@@ -68,6 +72,9 @@ func GetUsers() (users []User, err error) {
 // GetUserByID 根据 ID 获取 user
 func GetUserByID(id int) (user User, err error) {
 	err = SQLDB.Table(userTableName).Not(UserORM{Status: -1}).Where(UserORM{ID: id}).Scan(&user).Error
+	if err == nil && user.ID == 0 {
+		err = errors.New("user not find")
+	}
 	// 关联查询：
 	// 第一种方法用 Related 有效,
 	// 第二种方法用 Related 有效, 而且这种方式不用写 `gorm:"foreignkey:AutherID"` 就能查询
@@ -84,12 +91,18 @@ func GetUserByID(id int) (user User, err error) {
 // GetUserByName 根据 name 获取 user
 func GetUserByName(name string) (user User, err error) {
 	err = SQLDB.Table(userTableName).Not(UserORM{Status: -1}).Where(UserORM{Name: name}).Scan(&user).Error
+	if err == nil && user.ID == 0 {
+		err = errors.New("user not find")
+	}
 	return
 }
 
 // GetUserByEmail 根据 email 获取 user
 func GetUserByEmail(email string) (user User, err error) {
 	err = SQLDB.Table(userTableName).Not(UserORM{Status: -1}).Where(UserORM{Email: email}).Scan(&user).Error
+	if err == nil && user.ID == 0 {
+		err = errors.New("user not find")
+	}
 	return
 }
 

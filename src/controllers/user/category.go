@@ -1,10 +1,11 @@
 package user
 
 import (
+	"fmt"
 	"strconv"
 
 	"ecode/models"
-	"ecode/utils/message"
+	M "ecode/utils/message"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,17 +14,17 @@ import (
 func AddCategory(c *gin.Context) error {
 	var u models.CategoryORM
 	if c.ShouldBind(&u) != nil {
-		message.HandelError(c, message.ErrHTTPData.BindFail)
+		M.HandelError(c, M.ErrHTTPData.BindFail)
 		return ErrorDefault
 	}
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		message.HandelError(c, message.ErrUser.IDIllegal)
+		M.HandelError(c, M.ErrUser.IDIllegal)
 		return ErrorDefault
 	}
 	u.AutherID = userid
-	if models.AddCategory(&u) != nil {
-		message.HandelError(c, message.ErrCategory.AddFail)
+	if err = models.AddCategory(&u); err != nil {
+		M.HandelError(c, M.NewErrMsg(M.ErrCategory.AddFail, err))
 		return ErrorDefault
 	}
 	return nil
@@ -33,12 +34,12 @@ func AddCategory(c *gin.Context) error {
 func GetCategorys(c *gin.Context) ([]models.Category, error) {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		message.HandelError(c, message.ErrUser.IDIllegal)
+		M.HandelError(c, M.ErrUser.IDIllegal)
 		return nil, err
 	}
 	data, err := models.GetPrivateCategorys(userid)
 	if err != nil {
-		message.HandelError(c, message.ErrCategory.NotFound)
+		M.HandelError(c, M.NewErrMsg(M.ErrCategory.NotFound, err))
 		return nil, err
 	}
 	return data, nil
@@ -48,17 +49,17 @@ func GetCategorys(c *gin.Context) ([]models.Category, error) {
 func GetCategory(c *gin.Context) (models.Category, error) {
 	id, err := strconv.Atoi(c.Param("categoryid"))
 	if err != nil {
-		message.HandelError(c, message.ErrCategory.IDIllegal)
+		M.HandelError(c, M.ErrCategory.IDIllegal)
 		return CategoryDefault, err
 	}
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		message.HandelError(c, message.ErrUser.IDIllegal)
+		M.HandelError(c, M.ErrUser.IDIllegal)
 		return CategoryDefault, err
 	}
 	data, err := models.GetPrivateCategoryByID(userid, id)
 	if err != nil {
-		message.HandelError(c, message.ErrCategory.NotFound)
+		M.HandelError(c, M.NewErrMsg(M.ErrCategory.NotFound, err))
 		return CategoryDefault, err
 	}
 	return data, nil
@@ -68,24 +69,24 @@ func GetCategory(c *gin.Context) (models.Category, error) {
 func ModCategory(c *gin.Context) error {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		message.HandelError(c, message.ErrUser.IDIllegal)
+		M.HandelError(c, M.ErrUser.IDIllegal)
 		return ErrorDefault
 	}
 	id, err := strconv.Atoi(c.Param("categoryid"))
 	if err != nil {
-		message.HandelError(c, message.ErrCategory.IDIllegal)
+		M.HandelError(c, M.ErrCategory.IDIllegal)
 		return ErrorDefault
 	}
 	name := c.PostForm("name")
 
 	_, err = models.GetPrivateCategoryByID(userid, id)
 	if err != nil {
-		message.HandelError(c, message.ErrCategory.NotFound)
+		M.HandelError(c, M.NewErrMsg(M.ErrCategory.NotFound, err))
 		return ErrorDefault
 	}
 	err = models.ModCategoryByID(id, name)
 	if err != nil {
-		message.HandelError(c, message.ErrCategory.ModFail)
+		M.HandelError(c, M.NewErrMsg(M.ErrCategory.ModFail, err))
 		return ErrorDefault
 	}
 	return nil
@@ -95,22 +96,22 @@ func ModCategory(c *gin.Context) error {
 func DelCategory(c *gin.Context) error {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		message.HandelError(c, message.ErrUser.IDIllegal)
+		M.HandelError(c, M.ErrUser.IDIllegal)
 		return ErrorDefault
 	}
 	id, err := strconv.Atoi(c.Param("categoryid"))
 	if err != nil {
-		message.HandelError(c, message.ErrCategory.IDIllegal)
+		M.HandelError(c, M.ErrCategory.IDIllegal)
 		return ErrorDefault
 	}
 	_, err = models.GetPrivateCategoryByID(userid, id)
 	if err != nil {
-		message.HandelError(c, message.ErrCategory.NotFound)
+		M.HandelError(c, M.NewErrMsg(M.ErrCategory.NotFound, err))
 		return ErrorDefault
 	}
 	err = models.DelCategoryByID(id)
 	if err != nil {
-		message.HandelError(c, message.ErrCategory.DelFail)
+		M.HandelError(c, M.NewErrMsg(M.ErrCategory.DelFail, err))
 		return ErrorDefault
 	}
 	return nil
@@ -120,22 +121,25 @@ func DelCategory(c *gin.Context) error {
 func AddCardToCategory(c *gin.Context) error {
 	cardid, err := strconv.Atoi(c.PostForm("cardid"))
 	categoryid, err := strconv.Atoi(c.PostForm("categoryid"))
+	userid, err := strconv.Atoi(c.Param("userid"))
 	// 验证参数是否合法
 	if err != nil {
-		message.HandelError(c, message.ErrHTTPData.Illegal)
+		M.HandelError(c, M.ErrHTTPData.Illegal)
 		return ErrorDefault
 	}
 	// TODO: 验证是否是当前用户的 card 、category
-
+	card, err := models.GetPrivateCardByID(userid, cardid)
+	fmt.Println(card)
+	fmt.Println(err)
 	// 验证是否已经添加
 	num := models.IsCardCategoryExist(cardid, categoryid)
 	if num > 0 {
-		message.HandelError(c, message.ErrCardCategory.HasAdd)
+		M.HandelError(c, M.ErrCardCategory.HasAdd)
 		return ErrorDefault
 	}
 	err = models.AddCardToCategory(cardid, categoryid)
 	if err != nil {
-		message.HandelError(c, message.ErrHTTPData.AddFail)
+		M.HandelError(c, M.NewErrMsg(M.ErrHTTPData.AddFail, err))
 		return ErrorDefault
 	}
 	return nil
@@ -146,12 +150,12 @@ func RemoveCardToCategory(c *gin.Context) error {
 	cardid, err := strconv.Atoi(c.PostForm("cardid"))
 	categoryid, err := strconv.Atoi(c.PostForm("categoryid"))
 	if err != nil {
-		message.HandelError(c, message.ErrHTTPData.Illegal)
+		M.HandelError(c, M.ErrHTTPData.Illegal)
 		return ErrorDefault
 	}
 	err = models.RemoveCardToCategory(cardid, categoryid)
 	if err != nil {
-		message.HandelError(c, message.ErrHTTPData.DelFail)
+		M.HandelError(c, M.NewErrMsg(M.ErrHTTPData.DelFail, err))
 		return ErrorDefault
 	}
 	return nil

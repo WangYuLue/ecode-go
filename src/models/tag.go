@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"time"
 )
 
@@ -40,6 +41,9 @@ func AddTag(p *TagORM) (err error) {
 // GetPublicTagByID 根据 ID 获取【公开的】 tag
 func GetPublicTagByID(id int) (tag Tag, err error) {
 	err = SQLDB.Table(tagTableName).Where("status = ?", "0").Where(TagORM{ID: id}).Scan(&tag).Error
+	if err == nil && tag.ID == 0 {
+		err = errors.New("tag not find")
+	}
 	return
 }
 
@@ -52,6 +56,9 @@ func GetPrivateTags(autherID int) (tag []Tag, err error) {
 // GetPrivateTagByID 根据 ID 获取【私有的】 tag
 func GetPrivateTagByID(autherID int, id int) (tag Tag, err error) {
 	err = SQLDB.Table(tagTableName).Where(TagORM{AutherID: autherID}).Where("status = ?", "0").Where(TagORM{ID: id}).Scan(&tag).Error
+	if err == nil && tag.ID == 0 {
+		err = errors.New("tag not find")
+	}
 	return
 }
 

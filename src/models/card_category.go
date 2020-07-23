@@ -45,17 +45,27 @@ func RemoveCardToCategory(cardID int, categoryID int) (err error) {
 // IsCardCategoryExist -
 func IsCardCategoryExist(cardID int, categoryID int) (count int) {
 	SQLDB.Model(CardCategoryORM{}).Where("card_id = ? AND category_id = ?", cardID, categoryID).Count(&count)
+	// 下面的写法也可以查询数量
+	// SQLDB.Table(cardCategotyTableName).Where("card_id = ? AND category_id = ?", cardID, categoryID).Count(&count)
 	return
 }
 
 // GetCardIDsByCategoryID -
 func GetCardIDsByCategoryID(categoryID int) (cardids []int, err error) {
-	// TODO:
-	// err = SQLDB.Table(cardCategotyTableName).Where(CardCategoryORM{CategoryID: categoryID}).Scan(&cards).Error
+	var temps []CardCategory
+	err = SQLDB.Table(cardCategotyTableName).Where("category_id = ?", categoryID).Scan(&temps).Error
+	for _, temp := range temps {
+		cardids = append(cardids, temp.CardID)
+	}
 	return
 }
 
 // GetCategoryIDsByCardID -
-func GetCategoryIDsByCardID(categoryID int) (cards []Card, err error) {
+func GetCategoryIDsByCardID(cardID int) (categoryids []int, err error) {
+	var temps []CardCategory
+	err = SQLDB.Table(cardCategotyTableName).Where("card_id = ?", cardID).Scan(&temps).Error
+	for _, temp := range temps {
+		categoryids = append(categoryids, temp.CategoryID)
+	}
 	return
 }

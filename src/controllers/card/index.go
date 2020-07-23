@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"ecode/models"
-	"ecode/utils/message"
+	M "ecode/utils/message"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +13,7 @@ import (
 func GetCards(c *gin.Context) ([]models.Card, error) {
 	cards, err := models.GetPublicCards()
 	if err != nil {
-		message.HandelError(c, message.ErrCard.NotFound)
+		M.HandelError(c, M.NewErrMsg(M.ErrCard.NotFound, err))
 		return nil, err
 	}
 	return cards, nil
@@ -23,12 +23,12 @@ func GetCards(c *gin.Context) ([]models.Card, error) {
 func GetCard(c *gin.Context) (models.Card, error) {
 	id, err := strconv.Atoi(c.Param("cardid"))
 	if err != nil {
-		message.HandelError(c, message.ErrCard.IDIllegal)
+		M.HandelError(c, M.ErrCard.IDIllegal)
 		return models.Card{}, err
 	}
 	card, err := models.GetPublicCardByID(id)
 	if err != nil {
-		message.HandelError(c, message.ErrCard.NotFound)
+		M.HandelError(c, M.NewErrMsg(M.ErrCard.NotFound, err))
 		return models.Card{}, err
 	}
 	return card, nil

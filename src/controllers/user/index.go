@@ -4,9 +4,8 @@ import (
 	"ecode/models"
 	"ecode/utils/email"
 	"ecode/utils/md5"
-	"ecode/utils/message"
+	M "ecode/utils/message"
 	"errors"
-	"log"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -33,17 +32,16 @@ func Register(c *gin.Context) error {
 	nameStr := c.PostForm("name")
 	emailStr := c.PostForm("email")
 	passwordStr := c.PostForm("password")
-	log.Println(nameStr, passwordStr, emailStr)
 	if nameStr == "" || passwordStr == "" || emailStr == "" {
-		message.HandelError(c, message.ErrHTTPData.BindFail)
+		M.HandelError(c, M.ErrHTTPData.BindFail)
 		return ErrorDefault
 	}
 	if user, _ := models.GetUserByName(nameStr); user.Name != "" {
-		message.HandelError(c, message.ErrUser.NameExist)
+		M.HandelError(c, M.ErrUser.NameExist)
 		return ErrorDefault
 	}
 	if user, _ := models.GetUserByEmail(emailStr); user.Email != "" {
-		message.HandelError(c, message.ErrUser.EmailExist)
+		M.HandelError(c, M.ErrUser.EmailExist)
 		return ErrorDefault
 	}
 	passwordStr = md5.Md5(passwordStr)
@@ -54,7 +52,7 @@ func Register(c *gin.Context) error {
 	}
 	user, err := models.AddUser(p)
 	if err != nil {
-		message.HandelError(c, message.ErrUser.AddFail)
+		M.HandelError(c, M.NewErrMsg(M.ErrUser.AddFail, err))
 		return ErrorDefault
 	}
 	email.SendUserConfirmEmail(models.User{
@@ -69,7 +67,7 @@ func Register(c *gin.Context) error {
 func GetUsers(c *gin.Context) ([]models.User, error) {
 	data, err := models.GetUsers()
 	if err != nil {
-		message.HandelError(c, message.ErrUser.NotFound)
+		M.HandelError(c, M.NewErrMsg(M.ErrUser.NotFound, err))
 		return nil, err
 	}
 	return data, nil
@@ -79,12 +77,12 @@ func GetUsers(c *gin.Context) ([]models.User, error) {
 func GetUser(c *gin.Context) (models.User, error) {
 	id, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		message.HandelError(c, message.ErrUser.IDIllegal)
+		M.HandelError(c, M.ErrUser.IDIllegal)
 		return UserDefault, err
 	}
 	data, err := models.GetUserByID(id)
 	if err != nil {
-		message.HandelError(c, message.ErrUser.NotFound)
+		M.HandelError(c, M.NewErrMsg(M.ErrUser.NotFound, err))
 		return UserDefault, err
 	}
 	return data, nil
@@ -94,12 +92,12 @@ func GetUser(c *gin.Context) (models.User, error) {
 func GetCardsByUserID(c *gin.Context) ([]models.CardORM, error) {
 	id, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		message.HandelError(c, message.ErrUser.IDIllegal)
+		M.HandelError(c, M.ErrUser.IDIllegal)
 		return nil, err
 	}
 	data, err := models.GetCardsByUserID(id)
 	if err != nil {
-		message.HandelError(c, message.ErrUser.NotFound)
+		M.HandelError(c, M.NewErrMsg(M.ErrUser.NotFound, err))
 		return nil, err
 	}
 	return data, nil
@@ -110,17 +108,17 @@ func ModUser(c *gin.Context) error {
 	id, err := strconv.Atoi(c.Param("userid"))
 	name := c.PostForm("name")
 	if err != nil {
-		message.HandelError(c, message.ErrUser.IDIllegal)
+		M.HandelError(c, M.ErrUser.IDIllegal)
 		return ErrorDefault
 	}
 	_, err = models.GetUserByID(id)
 	if err != nil {
-		message.HandelError(c, message.ErrUser.NotFound)
+		M.HandelError(c, M.NewErrMsg(M.ErrUser.NotFound, err))
 		return ErrorDefault
 	}
 	err = models.ModUserByID(id, models.UserORM{Name: name})
 	if err != nil {
-		message.HandelError(c, message.ErrUser.ModFail)
+		M.HandelError(c, M.NewErrMsg(M.ErrUser.ModFail, err))
 		return ErrorDefault
 	}
 	return nil
@@ -130,17 +128,17 @@ func ModUser(c *gin.Context) error {
 func DelUser(c *gin.Context) error {
 	id, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		message.HandelError(c, message.ErrUser.IDIllegal)
+		M.HandelError(c, M.ErrUser.IDIllegal)
 		return ErrorDefault
 	}
 	_, err = models.GetUserByID(id)
 	if err != nil {
-		message.HandelError(c, message.ErrUser.NotFound)
+		M.HandelError(c, M.NewErrMsg(M.ErrUser.NotFound, err))
 		return ErrorDefault
 	}
 	err = models.DelUserByID(id)
 	if err != nil {
-		message.HandelError(c, message.ErrUser.DelFail)
+		M.HandelError(c, M.NewErrMsg(M.ErrUser.DelFail, err))
 		return ErrorDefault
 	}
 	return nil

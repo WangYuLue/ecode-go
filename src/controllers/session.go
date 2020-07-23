@@ -4,7 +4,7 @@ import (
 	myJwt "ecode/middlewares/jwt"
 	"ecode/models"
 	"ecode/utils/md5"
-	"ecode/utils/message"
+	M "ecode/utils/message"
 	"net/http"
 	"strconv"
 	"time"
@@ -21,14 +21,14 @@ func Login(c *gin.Context) {
 	name := c.PostForm("name")
 	password := c.PostForm("password")
 	if name == "" || password == "" {
-		message.HandelError(c, message.ErrHTTPData.BindFail)
+		M.HandelError(c, M.ErrHTTPData.BindFail)
 		return
 	}
 	_, err := models.GetUserByName(name)
 	if err != nil {
 		_, err := models.GetUserByEmail(name)
 		if err != nil {
-			message.HandelError(c, message.ErrUser.NotFound)
+			M.HandelError(c, M.NewErrMsg(M.ErrUser.NotFound, err))
 			return
 		}
 	}
@@ -36,7 +36,7 @@ func Login(c *gin.Context) {
 	password = md5.Md5(password)
 	user, err := models.Login(name, password)
 	if err != nil {
-		message.HandelError(c, message.ErrUser.PasswordIncorrect)
+		M.HandelError(c, M.NewErrMsg(M.ErrUser.PasswordIncorrect, err))
 		return
 	}
 	GenerateToken(c, user)
@@ -58,14 +58,14 @@ func GenerateToken(c *gin.Context, user models.User) {
 	token, err := j.CreateToken(claims)
 
 	if err != nil {
-		message.HandelError(c, message.ErrToken.GenerateFail)
+		M.HandelError(c, M.NewErrMsg(M.ErrToken.GenerateFail, err))
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "登录成功",
-		"data":    user,
-		"token":   token,
+		"M":     "登录成功",
+		"data":  user,
+		"token": token,
 	})
 	return
 }
@@ -75,7 +75,7 @@ func UpdateToken(c *gin.Context) {
 	token := c.PostForm("token")
 	newToken, err := j.RefreshToken(token)
 	if err != nil {
-		message.HandelError(c, message.ErrToken.UpdateFail)
+		M.HandelError(c, M.NewErrMsg(M.ErrToken.UpdateFail, err))
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
