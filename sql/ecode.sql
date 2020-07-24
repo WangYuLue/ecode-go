@@ -71,8 +71,9 @@ CONSTRAINT `FK_category_auther_id` FOREIGN KEY (`auther_id`) REFERENCES `user` (
 
 -- 分类问答表
 
-CREATE TABLE `catagory_card`
+CREATE TABLE `card_catagory`
 (
+ `id`          int unsigned NOT NULL AUTO_INCREMENT ,
  `category_id` int unsigned NOT NULL ,
  `card_id`     int unsigned NOT NULL ,
  `created_at`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
@@ -80,8 +81,8 @@ CREATE TABLE `catagory_card`
  `data`        text NULL ,
 
 PRIMARY KEY (`category_id`),
-CONSTRAINT `FK_catagory_card_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`),
-CONSTRAINT `FK_catagory_card_card_id` FOREIGN KEY (`card_id`) REFERENCES `card` (`card_id`)
+CONSTRAINT `FK_card_catagory_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`),
+CONSTRAINT `FK_card_catagory_card_id` FOREIGN KEY (`card_id`) REFERENCES `card` (`card_id`)
 ) CHARSET=utf8mb4;
 
 -- 问答贡献表
@@ -96,8 +97,8 @@ CREATE TABLE `card_contributer`
  `data`       text NULL ,
 
 PRIMARY KEY (`id`),
-CONSTRAINT `card_contributer_card_id` FOREIGN KEY (`card_id`) REFERENCES `card` (`card_id`),
-CONSTRAINT `card_contributer_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
+CONSTRAINT `FK_card_contributer_card_id` FOREIGN KEY (`card_id`) REFERENCES `card` (`card_id`),
+CONSTRAINT `FK_card_contributer_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
 ) CHARSET=utf8mb4;
 
 -- 问答标签表
@@ -112,8 +113,8 @@ CREATE TABLE `card_tag`
  `data`       text NULL ,
 
 PRIMARY KEY (`id`),
-CONSTRAINT `card_tag_card_id` FOREIGN KEY (`card_id`) REFERENCES `card` (`card_id`),
-CONSTRAINT `card_tag_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tag_id`)
+CONSTRAINT `FK_card_tag_card_id` FOREIGN KEY (`card_id`) REFERENCES `card` (`card_id`),
+CONSTRAINT `FK_card_tag_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tag_id`)
 ) CHARSET=utf8mb4;
 
 -- 评论表
@@ -131,9 +132,9 @@ CREATE TABLE `comment`
  `data`              text NULL ,
 
 PRIMARY KEY (`id`),
-CONSTRAINT `comment_id` FOREIGN KEY (`target_comment_id`) REFERENCES `comment` (`id`),
-CONSTRAINT `comment_auther_id` FOREIGN KEY (`auther_id`) REFERENCES `user` (`user_id`),
-CONSTRAINT `comment_card_id` FOREIGN KEY (`card_id`) REFERENCES `card` (`card_id`)
+CONSTRAINT `FK_comment_id` FOREIGN KEY (`target_comment_id`) REFERENCES `comment` (`id`),
+CONSTRAINT `FK_comment_auther_id` FOREIGN KEY (`auther_id`) REFERENCES `user` (`user_id`),
+CONSTRAINT `FK_comment_card_id` FOREIGN KEY (`card_id`) REFERENCES `card` (`card_id`)
 ) CHARSET=utf8mb4;
 
 -- 用户问答表
@@ -152,8 +153,8 @@ CREATE TABLE `user_card`
  `data`       text NULL ,
 
 PRIMARY KEY (`id`),
-CONSTRAINT `user_card_card_id` FOREIGN KEY (`card_id`) REFERENCES `card` (`card_id`),
-CONSTRAINT `user_card_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
+CONSTRAINT `FK_user_card_card_id` FOREIGN KEY (`card_id`) REFERENCES `card` (`card_id`),
+CONSTRAINT `FK_user_card_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
 ) CHARSET=utf8mb4;
 
 -- 用户分类表
@@ -168,8 +169,8 @@ CREATE TABLE `user_catagory`
  `data`        text NULL ,
 
 PRIMARY KEY (`id`),
-CONSTRAINT `user_catagory_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-CONSTRAINT `user_catagory_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`)
+CONSTRAINT `FK_user_catagory_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+CONSTRAINT `FK_user_catagory_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`)
 ) CHARSET=utf8mb4;
 
 -- 用户粉丝表
@@ -184,8 +185,8 @@ CREATE TABLE `user_like`
  `data`         text NULL ,
 
 PRIMARY KEY (`id`),
-CONSTRAINT `user_like_user_id_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-CONSTRAINT `user_like_user_id_2` FOREIGN KEY (`like_user_id`) REFERENCES `user` (`user_id`)
+CONSTRAINT `FK_user_like_user_id_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+CONSTRAINT `FK_user_like_user_id_2` FOREIGN KEY (`like_user_id`) REFERENCES `user` (`user_id`)
 ) CHARSET=utf8mb4;
 
 -- 用户标签表
@@ -200,6 +201,6 @@ CREATE TABLE `user_tag`
  `data`       text NULL ,
 
 PRIMARY KEY (`id`),
-CONSTRAINT `user_tag_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-CONSTRAINT `user_tag_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tag_id`)
+CONSTRAINT `FK_user_tag_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+CONSTRAINT `FK_user_tag_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tag_id`)
 ) CHARSET=utf8mb4;
