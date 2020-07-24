@@ -46,7 +46,7 @@ func DecodeErr(err error) (int, string) {
 }
 
 func handelError(c *gin.Context, httpCode int, err error) {
-	log.Error(c.ClientIP(), c.Request.URL, err.Error())
+	log.ErrorWithDeep(2, c.ClientIP(), c.Request.URL, err.Error())
 	code, message := DecodeErr(err)
 	c.JSON(httpCode, gin.H{
 		"code":    code,
@@ -56,7 +56,6 @@ func handelError(c *gin.Context, httpCode int, err error) {
 
 // HandelError 检查并处理 400 异常
 func HandelError(c *gin.Context, err error) {
-	fmt.Println(err)
 	handelError(c, http.StatusBadRequest, err)
 }
 

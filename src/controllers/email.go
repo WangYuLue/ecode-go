@@ -47,13 +47,11 @@ func ConfirmEmail(c *gin.Context) {
 func SendConfirmEmail(c *gin.Context) error {
 	idInt, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return ErrorDefault
+		return M.ErrUser.IDIllegal
 	}
 	user, err := models.GetUserByID(idInt)
 	if err != nil {
-		M.HandelError(c, M.ErrUser.NotFound)
-		return ErrorDefault
+		return M.NewErrMsg(M.ErrUser.NotFound, err)
 	}
 	email.SendUserConfirmEmail(user)
 	return nil
@@ -66,19 +64,16 @@ func ResetPassword(c *gin.Context) error {
 	password := c.PostForm("password")
 	uuid2 := redis.DB.HGet(redisKeys.EmailResetPassword, id).Val()
 	if uuid1 != uuid2 {
-		M.HandelError(c, M.ErrUser.UUIDIllegal)
-		return ErrorDefault
+		return M.ErrUser.UUIDIllegal
 	}
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		M.HandelError(c, M.ErrHTTPData.BindFail)
-		return ErrorDefault
+		return M.ErrHTTPData.BindFail
 	}
 	password = md5.Md5(password)
 	err = models.ModUserByID(idInt, models.UserORM{Password: password})
 	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrUser.ModPasswordFail, err))
-		return ErrorDefault
+		return M.NewErrMsg(M.ErrUser.ModPasswordFail, err)
 	}
 	return nil
 }
@@ -88,8 +83,7 @@ func SendResetPasswordEmail(c *gin.Context) error {
 	emailStr := c.Param("email")
 	user, err := models.GetUserByEmail(emailStr)
 	if err != nil {
-		M.HandelError(c, M.ErrUser.NotFound)
-		return ErrorDefault
+		return M.ErrUser.NotFound
 	}
 	email.SendResetPasswordEmail(user)
 	return nil

@@ -14,18 +14,15 @@ import (
 func AddTag(c *gin.Context) error {
 	var u models.TagORM
 	if c.ShouldBind(&u) != nil {
-		M.HandelError(c, M.ErrHTTPData.BindFail)
-		return ErrorDefault
+		return M.ErrHTTPData.BindFail
 	}
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return ErrorDefault
+		return M.ErrUser.IDIllegal
 	}
 	u.AutherID = userid
 	if models.AddTag(&u) != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrTag.AddFail, err))
-		return ErrorDefault
+		return M.NewErrMsg(M.ErrTag.AddFail, err)
 	}
 	return nil
 }
@@ -34,13 +31,11 @@ func AddTag(c *gin.Context) error {
 func GetTags(c *gin.Context) ([]models.Tag, error) {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return nil, err
+		return nil, M.ErrUser.IDIllegal
 	}
 	data, err := models.GetPrivateTags(userid)
 	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrTag.NotFound, err))
-		return nil, err
+		return nil, M.NewErrMsg(M.ErrTag.NotFound, err)
 	}
 	return data, nil
 }
@@ -49,18 +44,15 @@ func GetTags(c *gin.Context) ([]models.Tag, error) {
 func GetTag(c *gin.Context) (models.Tag, error) {
 	id, err := strconv.Atoi(c.Param("tagid"))
 	if err != nil {
-		M.HandelError(c, M.ErrTag.IDIllegal)
-		return TagDefault, err
+		return models.Tag{}, M.ErrTag.IDIllegal
 	}
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return TagDefault, err
+		return models.Tag{}, M.ErrUser.IDIllegal
 	}
 	data, err := models.GetPrivateTagByID(userid, id)
 	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrTag.NotFound, err))
-		return TagDefault, err
+		return models.Tag{}, M.NewErrMsg(M.ErrTag.NotFound, err)
 	}
 	return data, nil
 }
@@ -69,25 +61,19 @@ func GetTag(c *gin.Context) (models.Tag, error) {
 func ModTag(c *gin.Context) error {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return ErrorDefault
+		return M.ErrUser.IDIllegal
 	}
 	id, err := strconv.Atoi(c.Param("tagid"))
 	if err != nil {
-		M.HandelError(c, M.ErrTag.IDIllegal)
-		return ErrorDefault
+		return M.ErrTag.IDIllegal
 	}
 	name := c.PostForm("name")
 
-	_, err = models.GetPrivateTagByID(userid, id)
-	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrTag.NotFound, err))
-		return ErrorDefault
+	if _, err = models.GetPrivateTagByID(userid, id); err != nil {
+		return M.NewErrMsg(M.ErrTag.NotFound, err)
 	}
-	err = models.ModTagByID(id, name)
-	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrTag.ModFail, err))
-		return ErrorDefault
+	if err = models.ModTagByID(id, name); err != nil {
+		return M.NewErrMsg(M.ErrTag.ModFail, err)
 	}
 	return nil
 }
@@ -96,23 +82,17 @@ func ModTag(c *gin.Context) error {
 func DelTag(c *gin.Context) error {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return ErrorDefault
+		return M.ErrUser.IDIllegal
 	}
 	id, err := strconv.Atoi(c.Param("tagid"))
 	if err != nil {
-		M.HandelError(c, M.ErrTag.IDIllegal)
-		return ErrorDefault
+		return M.ErrTag.IDIllegal
 	}
-	_, err = models.GetPrivateTagByID(userid, id)
-	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrTag.NotFound, err))
-		return ErrorDefault
+	if _, err = models.GetPrivateTagByID(userid, id); err != nil {
+		return M.NewErrMsg(M.ErrTag.NotFound, err)
 	}
-	err = models.DelTagByID(id)
-	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrTag.DelFail, err))
-		return ErrorDefault
+	if err = models.DelTagByID(id); err != nil {
+		return M.NewErrMsg(M.ErrTag.DelFail, err)
 	}
 	return nil
 }

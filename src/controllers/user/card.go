@@ -13,18 +13,15 @@ import (
 func AddCard(c *gin.Context) error {
 	var u models.CardORM
 	if c.ShouldBind(&u) != nil {
-		M.HandelError(c, M.ErrHTTPData.BindFail)
-		return ErrorDefault
+		return M.ErrHTTPData.BindFail
 	}
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return ErrorDefault
+		return M.ErrUser.IDIllegal
 	}
 	u.AutherID = userid
 	if err = models.AddCard(&u); err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCard.AddFail, err))
-		return ErrorDefault
+		return M.NewErrMsg(M.ErrCard.AddFail, err)
 	}
 	return nil
 }
@@ -33,13 +30,11 @@ func AddCard(c *gin.Context) error {
 func GetCards(c *gin.Context) ([]models.Card, error) {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return nil, err
+		return nil, M.ErrUser.IDIllegal
 	}
 	data, err := models.GetPrivateCards(userid)
 	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCard.NotFound, err))
-		return nil, err
+		return nil, M.NewErrMsg(M.ErrCard.NotFound, err)
 	}
 	return data, nil
 }
@@ -48,19 +43,15 @@ func GetCards(c *gin.Context) ([]models.Card, error) {
 func GetCard(c *gin.Context) (models.Card, error) {
 	id, err := strconv.Atoi(c.Param("cardid"))
 	if err != nil {
-		M.HandelError(c, M.ErrCard.IDIllegal)
-		return CardDefault, err
+		return models.Card{}, M.ErrCard.IDIllegal
 	}
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return CardDefault, err
+		return models.Card{}, M.ErrUser.IDIllegal
 	}
-	// TODO: 将 err 提取到外面
 	data, err := models.GetPrivateCardByID(userid, id)
 	if err != nil {
-		M.HandelError(c, M.ErrCard.NotFound)
-		return CardDefault, err
+		return models.Card{}, M.ErrCard.NotFound
 	}
 	return data, nil
 }
@@ -69,26 +60,20 @@ func GetCard(c *gin.Context) (models.Card, error) {
 func ModCard(c *gin.Context) error {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return ErrorDefault
+		return M.ErrUser.IDIllegal
 	}
 	id, err := strconv.Atoi(c.Param("cardid"))
 	if err != nil {
-		M.HandelError(c, M.ErrCard.IDIllegal)
-		return ErrorDefault
+		return M.ErrCard.IDIllegal
 	}
+
 	question := c.PostForm("question")
 	answer := c.PostForm("answer")
-
-	_, err = models.GetPrivateCardByID(userid, id)
-	if err != nil {
-		M.HandelError(c, M.ErrCard.NotFound)
-		return ErrorDefault
+	if _, err = models.GetPrivateCardByID(userid, id); err != nil {
+		return M.ErrCard.NotFound
 	}
-	err = models.ModCardByID(id, question, answer)
-	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCard.ModFail, err))
-		return ErrorDefault
+	if err = models.ModCardByID(id, question, answer); err != nil {
+		return M.NewErrMsg(M.ErrCard.ModFail, err)
 	}
 	return nil
 }
@@ -97,23 +82,17 @@ func ModCard(c *gin.Context) error {
 func DelCard(c *gin.Context) error {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return ErrorDefault
+		return M.ErrUser.IDIllegal
 	}
 	id, err := strconv.Atoi(c.Param("cardid"))
 	if err != nil {
-		M.HandelError(c, M.ErrCard.IDIllegal)
-		return ErrorDefault
+		return M.ErrCard.IDIllegal
 	}
-	_, err = models.GetPrivateCardByID(userid, id)
-	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCard.NotFound, err))
-		return ErrorDefault
+	if _, err = models.GetPrivateCardByID(userid, id); err != nil {
+		return M.NewErrMsg(M.ErrCard.NotFound, err)
 	}
-	err = models.DelCardByID(id)
-	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCard.DelFail, err))
-		return ErrorDefault
+	if err = models.DelCardByID(id); err != nil {
+		return M.NewErrMsg(M.ErrCard.DelFail, err)
 	}
 	return nil
 }

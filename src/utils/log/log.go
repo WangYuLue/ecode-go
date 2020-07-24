@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"runtime"
 )
 
@@ -42,40 +41,51 @@ func init() {
 
 // Debug -
 func Debug(v ...interface{}) {
-	setPrefix(Level.Debug)
+	setPrefix(Level.Debug, 0)
 	logger.Println(v...)
 }
 
 // Info -
 func Info(v ...interface{}) {
-	setPrefix(Level.Info)
+	setPrefix(Level.Info, 0)
 	logger.Println(v...)
 }
 
 // Warn -
 func Warn(v ...interface{}) {
-	setPrefix(Level.Warn)
+	setPrefix(Level.Warn, 0)
 	logger.Println(v...)
 }
 
 // Error -
 func Error(v ...interface{}) {
-	setPrefix(Level.Error)
+	setPrefix(Level.Error, 0)
 	logger.Println(v...)
 }
 
 // Fatal -
 func Fatal(v ...interface{}) {
-	setPrefix(Level.Fatal)
+	setPrefix(Level.Fatal, 0)
 	logger.Fatalln(v...)
 }
 
-func setPrefix(level string) {
-	_, file, line, ok := runtime.Caller(defaultCallerDepth)
+// ErrorWithDeep -
+func ErrorWithDeep(deep int, v ...interface{}) {
+	setPrefix(Level.Error, deep)
+	logger.Println(v...)
+}
+
+func setPrefix(level string, deep int) {
+	pc, file, line, ok := runtime.Caller(defaultCallerDepth + deep)
+	name := runtime.FuncForPC(pc).Name()
+	// fileList := strings.Split(file, "ecode-go")
+	// if len(fileList) > 1 {
+	// 	file = fileList[1]
+	// }
 	if ok {
-		logPrefix = fmt.Sprintf("[%s][%s:%d]", level, filepath.Base(file), line)
+		logPrefix = fmt.Sprintf("[%s][%s:%d][%s]\r", level, file, line, name)
 	} else {
-		logPrefix = fmt.Sprintf("[%s]", level)
+		logPrefix = fmt.Sprintf("[%s]\r", level)
 	}
 	logger.SetPrefix(logPrefix)
 }

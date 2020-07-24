@@ -14,18 +14,15 @@ import (
 func AddCategory(c *gin.Context) error {
 	var u models.CategoryORM
 	if c.ShouldBind(&u) != nil {
-		M.HandelError(c, M.ErrHTTPData.BindFail)
-		return ErrorDefault
+		return M.ErrHTTPData.BindFail
 	}
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return ErrorDefault
+		return M.ErrUser.IDIllegal
 	}
 	u.AutherID = userid
 	if err = models.AddCategory(&u); err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCategory.AddFail, err))
-		return ErrorDefault
+		return M.NewErrMsg(M.ErrCategory.AddFail, err)
 	}
 	return nil
 }
@@ -34,13 +31,11 @@ func AddCategory(c *gin.Context) error {
 func GetCategorys(c *gin.Context) ([]models.Category, error) {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return nil, err
+		return nil, M.ErrUser.IDIllegal
 	}
 	data, err := models.GetPrivateCategorys(userid)
 	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCategory.NotFound, err))
-		return nil, err
+		return nil, M.NewErrMsg(M.ErrCategory.NotFound, err)
 	}
 	return data, nil
 }
@@ -49,18 +44,15 @@ func GetCategorys(c *gin.Context) ([]models.Category, error) {
 func GetCategory(c *gin.Context) (models.Category, error) {
 	id, err := strconv.Atoi(c.Param("categoryid"))
 	if err != nil {
-		M.HandelError(c, M.ErrCategory.IDIllegal)
-		return CategoryDefault, err
+		return models.Category{}, M.ErrCategory.IDIllegal
 	}
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return CategoryDefault, err
+		return models.Category{}, M.ErrUser.IDIllegal
 	}
 	data, err := models.GetPrivateCategoryByID(userid, id)
 	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCategory.NotFound, err))
-		return CategoryDefault, err
+		return models.Category{}, M.NewErrMsg(M.ErrCategory.NotFound, err)
 	}
 	return data, nil
 }
@@ -69,25 +61,18 @@ func GetCategory(c *gin.Context) (models.Category, error) {
 func ModCategory(c *gin.Context) error {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return ErrorDefault
+		return M.ErrUser.IDIllegal
 	}
 	id, err := strconv.Atoi(c.Param("categoryid"))
 	if err != nil {
-		M.HandelError(c, M.ErrCategory.IDIllegal)
-		return ErrorDefault
+		return M.ErrCategory.IDIllegal
 	}
 	name := c.PostForm("name")
-
-	_, err = models.GetPrivateCategoryByID(userid, id)
-	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCategory.NotFound, err))
-		return ErrorDefault
+	if _, err = models.GetPrivateCategoryByID(userid, id); err != nil {
+		return M.NewErrMsg(M.ErrCategory.NotFound, err)
 	}
-	err = models.ModCategoryByID(id, name)
-	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCategory.ModFail, err))
-		return ErrorDefault
+	if err = models.ModCategoryByID(id, name); err != nil {
+		return M.NewErrMsg(M.ErrCategory.ModFail, err)
 	}
 	return nil
 }
@@ -96,23 +81,17 @@ func ModCategory(c *gin.Context) error {
 func DelCategory(c *gin.Context) error {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	if err != nil {
-		M.HandelError(c, M.ErrUser.IDIllegal)
-		return ErrorDefault
+		return M.ErrUser.IDIllegal
 	}
 	id, err := strconv.Atoi(c.Param("categoryid"))
 	if err != nil {
-		M.HandelError(c, M.ErrCategory.IDIllegal)
-		return ErrorDefault
+		return M.ErrCategory.IDIllegal
 	}
-	_, err = models.GetPrivateCategoryByID(userid, id)
-	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCategory.NotFound, err))
-		return ErrorDefault
+	if _, err = models.GetPrivateCategoryByID(userid, id); err != nil {
+		return M.NewErrMsg(M.ErrCategory.NotFound, err)
 	}
-	err = models.DelCategoryByID(id)
-	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCategory.DelFail, err))
-		return ErrorDefault
+	if err = models.DelCategoryByID(id); err != nil {
+		return M.NewErrMsg(M.ErrCategory.DelFail, err)
 	}
 	return nil
 }
@@ -124,23 +103,18 @@ func AddCardToCategory(c *gin.Context) error {
 	userid, err := strconv.Atoi(c.Param("userid"))
 	// 验证参数是否合法
 	if err != nil {
-		M.HandelError(c, M.ErrHTTPData.Illegal)
-		return ErrorDefault
+		return M.ErrHTTPData.Illegal
 	}
 	// TODO: 验证是否是当前用户的 card 、category
 	card, err := models.GetPrivateCardByID(userid, cardid)
 	fmt.Println(card)
 	fmt.Println(err)
 	// 验证是否已经添加
-	num := models.IsCardCategoryExist(cardid, categoryid)
-	if num > 0 {
-		M.HandelError(c, M.ErrCardCategory.HasAdd)
-		return ErrorDefault
+	if num := models.IsCardCategoryExist(cardid, categoryid); num > 0 {
+		return M.ErrCardCategory.HasAdd
 	}
-	err = models.AddCardToCategory(cardid, categoryid)
-	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrHTTPData.AddFail, err))
-		return ErrorDefault
+	if err = models.AddCardToCategory(cardid, categoryid); err != nil {
+		return M.NewErrMsg(M.ErrHTTPData.AddFail, err)
 	}
 	return nil
 }
@@ -150,13 +124,10 @@ func RemoveCardToCategory(c *gin.Context) error {
 	cardid, err := strconv.Atoi(c.PostForm("cardid"))
 	categoryid, err := strconv.Atoi(c.PostForm("categoryid"))
 	if err != nil {
-		M.HandelError(c, M.ErrHTTPData.Illegal)
-		return ErrorDefault
+		return M.ErrHTTPData.Illegal
 	}
-	err = models.RemoveCardToCategory(cardid, categoryid)
-	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrHTTPData.DelFail, err))
-		return ErrorDefault
+	if err = models.RemoveCardToCategory(cardid, categoryid); err != nil {
+		return M.NewErrMsg(M.ErrHTTPData.DelFail, err)
 	}
 	return nil
 }

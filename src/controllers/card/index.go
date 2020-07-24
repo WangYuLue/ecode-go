@@ -13,8 +13,7 @@ import (
 func GetCards(c *gin.Context) ([]models.Card, error) {
 	cards, err := models.GetPublicCards()
 	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCard.NotFound, err))
-		return nil, err
+		return nil, M.NewErrMsg(M.ErrCard.NotFound, err)
 	}
 	return cards, nil
 }
@@ -23,13 +22,11 @@ func GetCards(c *gin.Context) ([]models.Card, error) {
 func GetCard(c *gin.Context) (models.Card, error) {
 	id, err := strconv.Atoi(c.Param("cardid"))
 	if err != nil {
-		M.HandelError(c, M.ErrCard.IDIllegal)
-		return models.Card{}, err
+		return models.Card{}, M.ErrCard.IDIllegal
 	}
 	card, err := models.GetPublicCardByID(id)
 	if err != nil {
-		M.HandelError(c, M.NewErrMsg(M.ErrCard.NotFound, err))
-		return models.Card{}, err
+		return models.Card{}, M.NewErrMsg(M.ErrCard.NotFound, err)
 	}
 	return card, nil
 }

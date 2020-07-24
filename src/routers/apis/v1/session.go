@@ -1,17 +1,28 @@
 package v1
 
 import (
-	"ecode/controllers"
+	C "ecode/controllers"
+	M "ecode/utils/message"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 // Login 登录接口
 func Login(c *gin.Context) {
-	controllers.Login(c)
+	data, err := C.Login(c)
+	if err != nil {
+		M.HandelError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, data)
 }
 
 // UpdateToken 更新token
 func UpdateToken(c *gin.Context) {
-	controllers.UpdateToken(c)
+	data, err := C.UpdateToken(c)
+	if err != nil {
+		M.HandelError(c, err)
+	}
+	c.JSON(http.StatusOK, data)
 }
