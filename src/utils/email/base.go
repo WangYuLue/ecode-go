@@ -58,7 +58,7 @@ func GenUserConfirmHTML(data models.Mail) (string, error) {
 	return doc.String(), nil
 }
 
-// GenUserConfirmHTML 生成激活用户模版文件
+// GenResetPasswordHTML 生成激活用户模版文件
 func GenResetPasswordHTML(data models.Mail) (string, error) {
 	var doc bytes.Buffer
 	var err error

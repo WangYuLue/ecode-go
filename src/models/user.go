@@ -41,7 +41,7 @@ type User struct {
 	UpdatedAt    time.Time `json:"updatedAt" form:"updated_at"`
 }
 
-// Login 用户登录
+// Login 用户登录 (TODO：测试是否有sql注入)
 func Login(name, password string) (user User, err error) {
 	queryString := "status  <> -1 AND (name = ? OR email = ?) AND password = ? AND name <> '' AND email <> '' AND password <> ''"
 	err = SQLDB.Table(userTableName).Where(queryString, name, name, password).Scan(&user).Error

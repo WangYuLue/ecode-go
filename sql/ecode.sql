@@ -190,7 +190,6 @@ CONSTRAINT `FK_user_like_user_id_2` FOREIGN KEY (`like_user_id`) REFERENCES `use
 ) CHARSET=utf8mb4;
 
 -- 用户标签表
-
 CREATE TABLE `user_tag`
 (
  `id`         int unsigned NOT NULL AUTO_INCREMENT ,

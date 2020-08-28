@@ -58,18 +58,9 @@ func GetPublicCardByID(id int) (card Card, err error) {
 	return
 }
 
-// GetPrivateCards 获取所有【私有的】 card
-func GetPrivateCards(autherID int) (cards []Card, err error) {
-	err = SQLDB.Table(cardTableName).Where(CardORM{AutherID: autherID}).Where("status <> ?", "-1").Scan(&cards).Error
-	return
-}
-
-// GetPrivateCardByID 根据 ID 获取【私有的】 card
-func GetPrivateCardByID(autherID int, id int) (card Card, err error) {
-	err = SQLDB.Table(cardTableName).Where(CardORM{AutherID: autherID}).Where("status = ?", "0").Where(CardORM{ID: id}).Scan(&card).Error
-	if err == nil && card.ID == 0 {
-		err = errors.New("card not find")
-	}
+// GetPublicCardsByIDs -
+func GetPublicCardsByIDs(ids []int) (cards []Card, err error) {
+	err = SQLDB.Table(cardTableName).Where("status = ?", "0").Where("card_id IN (?)", ids).Scan(&cards).Error
 	return
 }
 
@@ -82,5 +73,22 @@ func ModCardByID(id int, question string, answer string) (err error) {
 // DelCardByID 根据 ID 删除 card
 func DelCardByID(id int) (err error) {
 	err = SQLDB.Model(CardORM{ID: id}).Update("status", -1).Error
+	return
+}
+
+// ======= private =======
+
+// GetPrivateCards 获取所有【私有的】 card
+func GetPrivateCards(autherID int) (cards []Card, err error) {
+	err = SQLDB.Table(cardTableName).Where(CardORM{AutherID: autherID}).Where("status <> ?", "-1").Scan(&cards).Error
+	return
+}
+
+// GetPrivateCardByID 根据 ID 获取【私有的】 card
+func GetPrivateCardByID(autherID int, id int) (card Card, err error) {
+	err = SQLDB.Table(cardTableName).Where(CardORM{AutherID: autherID}).Where("status = ?", "0").Where(CardORM{ID: id}).Scan(&card).Error
+	if err == nil && card.ID == 0 {
+		err = errors.New("card not find")
+	}
 	return
 }

@@ -36,13 +36,13 @@ func AddCardToCategory(cardID int, categoryID int) (err error) {
 	return
 }
 
-// RemoveCardToCategory -
+// RemoveCardToCategory - (TODO:dangerous!!! 有SQL注入风险)
 func RemoveCardToCategory(cardID int, categoryID int) (err error) {
 	err = SQLDB.Delete(CardCategoryORM{}, "card_id = ? AND category_id = ?", cardID, categoryID).Error
 	return
 }
 
-// IsCardCategoryExist -
+// IsCardCategoryExist - (TODO:dangerous!!! 有SQL注入风险)
 func IsCardCategoryExist(cardID int, categoryID int) (count int) {
 	SQLDB.Model(CardCategoryORM{}).Where("card_id = ? AND category_id = ?", cardID, categoryID).Count(&count)
 	// 下面的写法也可以查询数量
